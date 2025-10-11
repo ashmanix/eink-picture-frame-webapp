@@ -1,0 +1,20 @@
+[project]
+name = "web"
+version = "0.1.0"
+description = "A simple web UI for an e-ink picture frame"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.118.3",
+]
+
+[project.scripts]
+dev = "web.main:dev"
+serve = "web.main:serve"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+package = true
