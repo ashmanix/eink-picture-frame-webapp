@@ -1,15 +1,19 @@
 from typing import Annotated
-from fastapi import FastAPI, Path, HTTPException
+from fastapi import FastAPI, Path, HTTPException, UploadFile, File
+from dotenv import load_dotenv
+import traceback
 
 from web.utils import (
     delete_image,
     save_image,
     set_display_image,
-    filename_validation_regex,
+    check_is_valid_image_type,
+    FILENAME_VALIDATION_REGEX,
 )
 from .logger import logger
 
 app = FastAPI()
+load_dotenv()
 
 
 @app.get("/")
@@ -24,29 +28,30 @@ async def delete(
         Path(
             title="The name of the file to delete",
             max_length=100,
-            pattern=filename_validation_regex,
+            pattern=FILENAME_VALIDATION_REGEX,
         ),
     ],
 ):
     try:
-        result = await delete_image(filename)
-        if result:
-            return {"result": "successful"}
-        return {"result": "unsuccessful"}
+        delete_image(filename)
+        return {"result": "successful"}
 
+    except FileNotFoundError as err:
+        handle_error(err, f"File {filename} could not be found", 404)
     except Exception as err:
-        logger.error(f"Error deleting image with error: {err}")
-        raise HTTPException(status_code=500, detail=str(err))
+        handle_error(err, f"Error deleting image with error: {err}")
 
 
 @app.post("/image/upload")
-async def upload():
+async def upload_image(file: UploadFile = File(...)):
     try:
-        await save_image()
-        return {"result": "yo"}
+        filename = file.filename
+        if not check_is_valid_image_type(filename):
+            raise TypeError(f"{filename} is not a valid image file type!")
+        save_image(file)
+        return {"result": "success"}
     except Exception as err:
-        logger.error(f"Error uploading image with error: {err}")
-        raise HTTPException(status_code=500, detail=str(err))
+        handle_error(err, f"Error uploading image with error: {err}")
 
 
 @app.post("/image/display/{filename}")
@@ -56,18 +61,21 @@ async def set_current(
         Path(
             title="The name of the file to set as the current display image",
             max_length=100,
-            pattern=filename_validation_regex,
+            pattern=FILENAME_VALIDATION_REGEX,
         ),
     ],
 ):
     try:
-        result = set_display_image(filename)
-        if result:
-            return {"result": "successful"}
-        return {"result": "unsuccessful"}
+        set_display_image(filename)
+        return {"result": "successful"}
     except Exception as err:
-        logger.error(f"Error setting current image with error: {err}")
-        raise HTTPException(status_code=500, detail=str(err))
+        handle_error(err, f"Error setting current image with error: {err}")
+
+
+def handle_error(err: Exception, msg: str, code: int = 500):
+    logger.error(msg)
+    traceback.print_exc()
+    raise HTTPException(status_code=code, detail=str(err))
 
 
 def dev():

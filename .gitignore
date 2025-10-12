@@ -11,6 +11,7 @@ wheels/
 
 .vscode
 .env
+images
 
 # MacOS-generated filers
 .DS_store
