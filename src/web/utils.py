@@ -65,4 +65,4 @@ def set_display_image(filename: str):
             f"The file {filename} could not be found on the device!"
         )
     else:
-        display_image(file_location)
+        display_image(display, file_location)
