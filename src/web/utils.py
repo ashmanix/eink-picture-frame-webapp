@@ -74,3 +74,13 @@ def set_display_image(filename: str):
         )
     else:
         display_image(display, file_location)
+
+
+def get_image_list() -> list[str]:
+    file_list = os.listdir(IMAGE_FOLDER_LOCATION)
+    image_file_list = []
+    for filename in file_list:
+        if check_is_valid_image_type(filename):
+            image_file_list.append(filename)
+    logger.info(os.listdir(IMAGE_FOLDER_LOCATION))
+    return image_file_list

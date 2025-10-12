@@ -10,6 +10,7 @@ from web.utils import (
     set_display_image,
     check_is_valid_image_type,
     delete_image_list,
+    get_image_list,
 )
 
 from web.constants import FILENAME_VALIDATION_REGEX
@@ -24,6 +25,16 @@ load_dotenv()
 @app.get("/")
 async def root():
     return {"message": "Hello World!"}
+
+
+@app.get("/image/")
+async def get_list():
+    try:
+        results = get_image_list()
+        return {"image_list": results}
+
+    except Exception as err:
+        handle_error(err, f"Error getting list of images with error: {err}")
 
 
 @app.post("/image/delete/")
