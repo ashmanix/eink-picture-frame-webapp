@@ -6,19 +6,14 @@ import shutil
 from fastapi import UploadFile
 
 from web.display import get_display, display_image
+from web.models import FileError, FileDeletionResults
+from web.constants import FILENAME_VALIDATION_REGEX, IMAGE_FOLDER_LOCATION
 
 display = get_display()
 
 
-ROOT = Path(__file__).resolve().parents[2]  # adjust depth once
-SRC = ROOT / "src"
-FILENAME_VALIDATION_REGEX = r"^.*\.(jpg|JPG|jpeg|JPEG|png|PNG|pdf|PDF)$"
-
-IMAGE_FOLDER_LOCATION = f"{ROOT}{os.getenv("IMAGE_FOLDER_NAME")}"
-
-
 def check_is_valid_image_type(filename: str) -> bool:
-    is_match = re.search(r"^.*\.(jpg|JPG|jpeg|JPEG|png|PNG|pdf|PDF)$", filename)
+    is_match = re.search(FILENAME_VALIDATION_REGEX, filename)
 
     if is_match:
         return True
@@ -37,6 +32,19 @@ def delete_image(filename: str):
     else:
         os.remove(file_location)
         logger.info(f"File: {filename} was successfully removed!")
+
+
+def delete_image_list(filename_list: list[str]) -> FileDeletionResults:
+    successful_list: list[str] = []
+    failed_list: list[FileError] = []
+
+    for filename in filename_list:
+        try:
+            delete_image(filename)
+            successful_list.append(filename)
+        except Exception as err:
+            failed_list.append(FileError(filename=filename, error_message=str(err)))
+    return FileDeletionResults(successful=successful_list, failed=failed_list)
 
 
 def save_image(image_file: UploadFile):

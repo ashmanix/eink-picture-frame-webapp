@@ -1,6 +1,7 @@
-from typing import Annotated
-from fastapi import FastAPI, Path, HTTPException, UploadFile, File
+from typing import Annotated, List
+from fastapi import FastAPI, Path, HTTPException, UploadFile, File, Body
 from dotenv import load_dotenv
+
 import traceback
 
 from web.utils import (
@@ -8,8 +9,12 @@ from web.utils import (
     save_image,
     set_display_image,
     check_is_valid_image_type,
-    FILENAME_VALIDATION_REGEX,
+    delete_image_list,
 )
+
+from web.constants import FILENAME_VALIDATION_REGEX
+
+from web.models import Filename
 from .logger import logger
 
 app = FastAPI()
@@ -19,6 +24,16 @@ load_dotenv()
 @app.get("/")
 async def root():
     return {"message": "Hello World!"}
+
+
+@app.post("/image/delete/")
+async def delete_list(files: List[Filename]):
+    try:
+        results = delete_image_list(files)
+        return results
+
+    except Exception as err:
+        handle_error(err, f"Error deleting list of images with error: {err}")
 
 
 @app.post("/image/delete/{filename}")

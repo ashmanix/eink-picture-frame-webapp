@@ -31,12 +31,6 @@ def display_image(display: any, file_location: str):
 
         saturation = args.saturation
 
-        # if not args.file:
-        #     print(
-        #         f"""Usage:
-        #         {sys.argv[0]} --file image.png (--saturation 0.5)"""
-        #     )
-        #     sys.exit(1)
         image = Image.open(file_location)
         resized_image = image.resize(display.resolution)
         try:
