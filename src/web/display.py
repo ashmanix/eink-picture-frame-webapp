@@ -14,7 +14,7 @@ def get_display():
     return None
 
 
-def display_image(display: any, filename: str):
+def display_image(display: any, file_location: str):
     if sys.platform.startswith("linux"):
         parser = argparse.ArgumentParser()
 
@@ -31,13 +31,13 @@ def display_image(display: any, filename: str):
 
         saturation = args.saturation
 
-        if not args.file:
-            print(
-                f"""Usage:
-                {sys.argv[0]} --file image.png (--saturation 0.5)"""
-            )
-            sys.exit(1)
-        image = Image.open(filename)
+        # if not args.file:
+        #     print(
+        #         f"""Usage:
+        #         {sys.argv[0]} --file image.png (--saturation 0.5)"""
+        #     )
+        #     sys.exit(1)
+        image = Image.open(file_location)
         resized_image = image.resize(display.resolution)
         try:
             display.set_image(resized_image, saturation=saturation)
@@ -45,4 +45,6 @@ def display_image(display: any, filename: str):
             display.set_image(resized_image)
         display.show()
     else:
-        logger.warning("No display found, check to see if running on RaspberryPi!")
+        logger.warning(
+            "No display found, check to see if this running on a RaspberryPi!"
+        )
