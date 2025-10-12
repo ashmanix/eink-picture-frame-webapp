@@ -44,6 +44,11 @@ def save_image(image_file: UploadFile):
     logger.info(f"Attempting to save file: {filename} to folder")
 
     file_location = f"{IMAGE_FOLDER_LOCATION}/{filename}"
+
+    # Create the images folder for the file if it doesn't already exist
+    file_path = Path(file_location)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(image_file.file, buffer)
     logger.info(f"File: {filename}, saved!")
