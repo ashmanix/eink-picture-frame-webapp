@@ -1,0 +1,33 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+.main-article {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+#content {
+    flex: 1;
+}
+
+#list-of-cards {
+    position: relative;
+}
+
+.loading {
+    display: none;
+}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{%block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+
+<section id="main">
+    <!-- <h2>Home</h2> -->
+    <form role="search">
+        <input name="search" type="search" placeholder="Search" />
+        <input type="submit" value="Search" class="pico-background-pusple-700" />
+    </form>
+    <section id="list-of-cards">
+        <article class="loading" aria-busy="true"></article>
+        <h3>Images</h3>
+        <p>List of images saved on device</p>
+        <div>
+            {% for image in image_list %}
+            <article class="pico-background-purple-700z">
+                <h4>{{ image.filename }}</h4>
+                <p>{{ image.last_updated }}</p>
+                <button class="secondary">Delete</button>
+                <button>Set</button>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+
+{% endblock %}

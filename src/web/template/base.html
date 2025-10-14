@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="css/pico.min.css"> -->
+    <link rel="stylesheet" href="css/pico.colors.min.css">
+    <link rel="stylesheet" href="css/pico.purple.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <title>{% block title %}{% endblock %} - E-Ink Picture Frame App</title>
+    {% endblock %}
+</head>
+
+<body class="container">
+    <article class="main-article">
+        <header>
+            <nav>
+                <ul>
+                    <li>
+                        <strong>
+                            Ashmanix E-Ink App
+                        </strong>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main id="content">{% block content %}{% endblock %}</main>
+
+        <footer id="footer">
+            {% block footer %}
+            &copy; Copyright 2025 by <a href="https://ashmanix.com">Ashmanix</a>
+            {% endblock %}
+        </footer>
+    </article>
+</body>
+
+</html>

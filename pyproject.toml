@@ -12,6 +12,7 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "rpi-gpio>=0.7.1 ; sys_platform == 'linux'",
     "spidev>=3.8 ; sys_platform == 'linux'",
+    "sqlmodel>=0.0.27",
 ]
 
 [project.scripts]

@@ -1,5 +1,7 @@
 from typing import Annotated, List
 from pydantic import StringConstraints, BaseModel, Field
+from datetime import datetime, timezone
+from sqlmodel import Field, SQLModel
 
 from web.constants import FILENAME_VALIDATION_REGEX
 
@@ -21,10 +23,16 @@ class FilesIn(BaseModel):
 
 
 class FileError(BaseModel):
-    filename: str
+    id: int
     error_message: str
 
 
 class FileDeletionResults(BaseModel):
     successful: list[str]
     failed: list[FileError]
+
+
+class PictureFrameImage(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    filename: str = Field(index=True)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
