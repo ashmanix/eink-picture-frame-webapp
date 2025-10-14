@@ -6,26 +6,63 @@
 {% block content %}
 
 <section id="main">
-    <!-- <h2>Home</h2> -->
-    <form role="search">
-        <input name="search" type="search" placeholder="Search" />
-        <input type="submit" value="Search" class="pico-background-pusple-700" />
-    </form>
+    <section>
+        <form role="search">
+            <input name="search" type="search" placeholder="Search" />
+            <input type="submit" value="Search" />
+        </form>
+    </section>
+
+    <section>
+        <input type="file" id="file-upload" name="file-upload" accept="image/png, image/jpeg, image/jpg, image.pdf" />
+        <button id="upload-button">Upload</button>
+    </section>
+
     <section id="list-of-cards">
         <article class="loading" aria-busy="true"></article>
         <h3>Images</h3>
-        <p>List of images saved on device</p>
         <div>
+            {% if not image_list %}
+            <h5>No images saved to the device.</h5>
+            {% endif %}
             {% for image in image_list %}
-            <article class="pico-background-purple-700z">
-                <h4>{{ image.filename }}</h4>
-                <p>{{ image.last_updated }}</p>
-                <button class="secondary">Delete</button>
-                <button>Set</button>
+            <article class="image-card">
+                <div class="image-card-details">
+                    <h3>Filename: {{ image.filename }}</h3>
+                    <h4>ID: {{ image.id }}</h4>
+                    <p>Created At: {{ image.created_at|format_datetime }}</p>
+                </div>
+                <div class="grid">
+                    <button onclick="deleteImage({{image.id}})" class="secondary">Delete</button>
+                    <button onclick="setImage({{image.id}})">Set</button>
+                </div>
             </article>
             {% endfor %}
         </div>
     </section>
 </section>
+
+<!-- <dialog id="upload-image-modal">
+    <article>
+        <header>
+            <button aria-label="Close" rel="prev" data-target="upload-image-modal"
+                onclick="toggleModal(event)"></button>
+            <h3>Upload Image</h3>
+        </header>
+        <p>
+            Select an image to upload.
+        </p>
+        <footer>
+            <button class="secondary" data-target="upload-image-modal" onclick="toggleModal(event)">
+                Cancel
+            </button>
+            <button autofocus data-target="upload-image-modal" onclick="toggleModal(event)">
+                Confirm
+            </button>
+        </footer>
+    </article>
+</dialog> -->
+
+<script src="js/main.js"></script>
 
 {% endblock %}

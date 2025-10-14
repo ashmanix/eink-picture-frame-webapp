@@ -1,5 +1,5 @@
 from sqlmodel import Session, SQLModel, create_engine, select
-from typing import Annotated, List
+from typing import List
 from fastapi import Depends
 from web.models import PictureFrameImage
 
@@ -18,9 +18,6 @@ def create_db_and_tables():
 def get_session():
     with Session(engine) as session:
         yield session
-
-
-# SessionDep = Annotated[Session, Depends(get_session)]
 
 
 def get_item(id: int, session: Session) -> PictureFrameImage:

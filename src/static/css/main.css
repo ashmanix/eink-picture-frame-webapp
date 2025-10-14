@@ -31,3 +31,18 @@ main {
 .loading {
     display: none;
 }
+
+.image-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.image-card-details {
+    flex-grow: 2;
+}
+
+.image-card-buttons {
+    align-content: flex-end;
+    justify-self: flex-end;
+    flex: 3;
+}

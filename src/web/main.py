@@ -1,9 +1,10 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import FastAPI, Path, HTTPException, UploadFile, File, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+from web.models import PictureFrameImage
 from web.sql import create_db_and_tables, get_all, get_session
 from dotenv import load_dotenv
 from sqlmodel import Session
@@ -17,6 +18,7 @@ from web.utils import (
     check_is_valid_image_type,
     delete_image_list,
     get_image_list,
+    format_datetime,
 )
 
 from web.constants import FILENAME_VALIDATION_REGEX
@@ -33,15 +35,17 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.mount("/images", StaticFiles(directory="src/static/images"), name="images")
 app.mount("/css", StaticFiles(directory="src/static/css"), name="css")
+app.mount("/js", StaticFiles(directory="src/static/js"), name="js")
 templates = Jinja2Templates(directory="src/web/template")
+templates.env.filters["format_datetime"] = format_datetime
 load_dotenv()
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
 @app.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    image_list = get_image_list()
+async def root(request: Request, session: SessionDep):
+    image_list: List[PictureFrameImage] = get_image_list(session)
     return templates.TemplateResponse(
         request=request, name="home.html", context={"image_list": image_list}
     )
@@ -95,19 +99,13 @@ async def upload_image(session: SessionDep, file: UploadFile = File(...)):
         handle_error(err, f"Error uploading image with error: {err}")
 
 
-@app.post("/image/display/{filename}")
+@app.post("/image/display/{id}")
 async def set_current(
-    filename: Annotated[
-        str,
-        Path(
-            title="The name of the file to set as the current display image",
-            max_length=100,
-            pattern=FILENAME_VALIDATION_REGEX,
-        ),
-    ],
+    id: int,
+    session: SessionDep,
 ):
     try:
-        set_display_image(filename)
+        set_display_image(id, session)
         return {"result": "successful"}
     except Exception as err:
         handle_error(err, f"Error setting current image with error: {err}")

@@ -1,15 +1,18 @@
-from typing import IO
+from typing import IO, List
 from .logger import logger
 from pathlib import Path
 import re
 import os
 import shutil
+from datetime import datetime
 
 from web.display import get_display, display_image
 from web.models import FileError, FileDeletionResults, PictureFrameImage
 from web.constants import FILENAME_VALIDATION_REGEX, IMAGE_FOLDER_LOCATION
-from web.sql import get_item, delete_item, add_item
+from web.sql import get_item, delete_item, add_item, get_all
 from sqlmodel import Session
+
+from markupsafe import Markup, escape
 
 display = get_display()
 
@@ -72,11 +75,15 @@ def save_image(filename: str, file: IO[bytes], session: Session):
     logger.info(f"File: {filename}, saved!")
 
 
-def set_display_image(filename: str):
-    logger.info(f"Attempting to display file: {filename} on screen.")
-    file_location = f"{IMAGE_FOLDER_LOCATION}/{filename}"
+def set_display_image(id: int, session: Session):
+    logger.info(f"Attempting to display filimage ID: {id} on screen.")
     if display is None:
         raise RuntimeError("No display found on device!")
+
+    image: PictureFrameImage = get_item(id, session)
+    filename = image.filename
+
+    file_location = f"{IMAGE_FOLDER_LOCATION}/{filename}"
 
     if not os.path.exists(file_location):
         raise FileNotFoundError(
@@ -86,10 +93,9 @@ def set_display_image(filename: str):
         display_image(display, file_location)
 
 
-def get_image_list() -> list[str]:
-    file_list = os.listdir(IMAGE_FOLDER_LOCATION)
-    image_file_list = []
-    for filename in file_list:
-        if check_is_valid_image_type(filename):
-            image_file_list.append(filename)
-    return image_file_list
+def get_image_list(session: Session) -> List[PictureFrameImage]:
+    return get_all(session)
+
+
+def format_datetime(value, format="%d-%m-%Y %H:%M"):
+    return value.strftime(format)
