@@ -82,7 +82,7 @@ uploadButton.addEventListener("click", async () => {
   form.append("file", file);
 
   try {
-    url = "/image/upload";
+    const url = "/image/upload";
     const response = await fetch(url, {
       method: "POST",
       body: form,
@@ -91,6 +91,7 @@ uploadButton.addEventListener("click", async () => {
     if (!response.ok) throw new Error("Error uploading image!");
     const data = await response.json();
     console.log("Uploaded:", data);
+    updateList();
   } catch (error) {
     console.error("Upload failed:", error);
     alert("Upload failed.");
@@ -98,6 +99,22 @@ uploadButton.addEventListener("click", async () => {
 });
 
 const deleteButton = document.getElementById("delete-button");
+const imageList = document.getElementById("image-list");
+
+const updateList = async () => {
+  try {
+    const url = `/image_list/partial`;
+    const response = await fetch(url);
+
+    if (!response.ok) throw new Error(`Error getting image list partial`);
+    const html = await response.text();
+
+    document.getElementById("image-list-container").innerHTML = html;
+  } catch (error) {
+    console.error("Image partial retrieval failed:", error);
+    alert("Image partial retrieval failed.");
+  }
+};
 
 const deleteImage = async (id) => {
   try {
@@ -112,5 +129,7 @@ const deleteImage = async (id) => {
   } catch (error) {
     console.error("Deletion failed:", error);
     alert("Deletion failed.");
+  } finally {
+    updateList();
   }
 };

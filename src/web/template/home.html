@@ -14,14 +14,21 @@
     </section>
 
     <section>
-        <input type="file" id="file-upload" name="file-upload" accept="image/png, image/jpeg, image/jpg, image.pdf" />
+        <label for="file">
+            File upload
+            <input type="file" id="file-upload" name="file-upload"
+                accept="image/png, image/jpeg, image/jpg, image.pdf" />
+        </label>
         <button id="upload-button">Upload</button>
     </section>
 
     <section id="list-of-cards">
         <article class="loading" aria-busy="true"></article>
         <h3>Images</h3>
-        <div>
+        <section id="image-list-container">
+            {% include "partial/image_list.html" %}
+        </section>
+        <!-- <div>
             {% if not image_list %}
             <h5>No images saved to the device.</h5>
             {% endif %}
@@ -38,7 +45,7 @@
                 </div>
             </article>
             {% endfor %}
-        </div>
+        </div> -->
     </section>
 </section>
 

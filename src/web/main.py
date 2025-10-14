@@ -51,6 +51,16 @@ async def root(request: Request, session: SessionDep):
     )
 
 
+@app.get("/image_list/partial")
+async def get_list_partial(request: Request, session: SessionDep):
+    image_list: List[PictureFrameImage] = get_image_list(session)
+    return templates.TemplateResponse(
+        request=request,
+        name="partial/image_list.html",
+        context={"image_list": image_list},
+    )
+
+
 @app.get("/image_list")
 async def get_list(session: SessionDep):
     try:
