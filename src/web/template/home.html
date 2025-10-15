@@ -6,70 +6,43 @@
 {% block content %}
 
 <section id="main">
-    <section>
-        <form role="search">
-            <input name="search" type="search" placeholder="Search" />
-            <input type="submit" value="Search" />
-        </form>
-    </section>
-
-    <section>
-        <label for="file">
-            File upload
-            <input type="file" id="file-upload" name="file-upload"
-                accept="image/png, image/jpeg, image/jpg, image.pdf" />
-        </label>
-        <button id="upload-button">Upload</button>
-    </section>
+    <div class="level top-level">
+        <div class="level-right">
+            <div class="level-item">
+                <h2 class="title">Images</h2>
+            </div>
+            <div class="level-item">
+                <h5 class="subtitle is-5">Images saved on the device</h5>
+            </div>
+        </div>
+        <div class="level-left">
+            <div class="level-item">
+                <div class="field has-addons">
+                    <p class="control">
+                        <input class="input" type="text" placeholder="Filter images" />
+                    </p>
+                    <p class="control">
+                        <button class="button is-link">Search</button>
+                    </p>
+                </div>
+            </div>
+            <div class="level-item">
+                <button id="refresh-list-button" class="button is-link">Refresh</button>
+            </div>
+        </div>
+    </div>
 
     <section id="list-of-cards">
-        <article class="loading" aria-busy="true"></article>
-        <h3>Images</h3>
-        <section id="image-list-container">
+        <div class="loading" aria-busy="true"></div>
+        <div id="image-list-container">
             {% include "partial/image_list.html" %}
-        </section>
-        <!-- <div>
-            {% if not image_list %}
-            <h5>No images saved to the device.</h5>
-            {% endif %}
-            {% for image in image_list %}
-            <article class="image-card">
-                <div class="image-card-details">
-                    <h3>Filename: {{ image.filename }}</h3>
-                    <h4>ID: {{ image.id }}</h4>
-                    <p>Created At: {{ image.created_at|format_datetime }}</p>
-                </div>
-                <div class="grid">
-                    <button onclick="deleteImage({{image.id}})" class="secondary">Delete</button>
-                    <button onclick="setImage({{image.id}})">Set</button>
-                </div>
-            </article>
-            {% endfor %}
-        </div> -->
+        </div>
     </section>
 </section>
 
-<!-- <dialog id="upload-image-modal">
-    <article>
-        <header>
-            <button aria-label="Close" rel="prev" data-target="upload-image-modal"
-                onclick="toggleModal(event)"></button>
-            <h3>Upload Image</h3>
-        </header>
-        <p>
-            Select an image to upload.
-        </p>
-        <footer>
-            <button class="secondary" data-target="upload-image-modal" onclick="toggleModal(event)">
-                Cancel
-            </button>
-            <button autofocus data-target="upload-image-modal" onclick="toggleModal(event)">
-                Confirm
-            </button>
-        </footer>
-    </article>
-</dialog> -->
 
-<script src="js/main.js"></script>
 
+{% endblock %}
+{% block scripts %}
+<script type="module" src="js/pages/home.js"></script>
 {% endblock %}

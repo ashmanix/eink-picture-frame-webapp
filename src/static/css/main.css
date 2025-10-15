@@ -14,14 +14,23 @@ main {
     flex: 1;
 }
 
+footer {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
 .main-article {
     display: flex;
     flex: 1;
     flex-direction: column;
 }
 
+.top-bar {
+    padding-top: 1rem;
+}
+
 #content {
-    flex: 1;
+    /* flex: 1; */
 }
 
 #list-of-cards {
@@ -35,6 +44,8 @@ main {
 .image-card {
     display: flex;
     flex-direction: column;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 .image-card-details {

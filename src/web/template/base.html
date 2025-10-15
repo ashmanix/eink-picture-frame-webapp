@@ -5,35 +5,54 @@
     {% block head %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="stylesheet" href="css/pico.min.css"> -->
-    <link rel="stylesheet" href="css/pico.colors.min.css">
-    <link rel="stylesheet" href="css/pico.purple.min.css">
+    <link rel="stylesheet" href="css/bulma.min.css">
     <link rel="stylesheet" href="css/main.css">
     <title>{% block title %}{% endblock %} - E-Ink Picture Frame App</title>
     {% endblock %}
 </head>
 
 <body class="container">
-    <article class="main-article">
-        <header>
-            <nav>
-                <ul>
-                    <li>
-                        <h3>
-                            Ashmanix E-Ink App
-                        </h3>
-                    </li>
-                </ul>
-            </nav>
+    <div class="hero is-link">
+        <header class="hero-body">
+            <p class="title">
+                E-Ink Frame App
+            </p>
         </header>
+    </div>
 
-        <main id="content">{% block content %}{% endblock %}</main>
+    <div class="level top-level top-bar">
+        <!-- <div class="level-left"></div> -->
+        <div class="level-left">
+            <div class="level-item">
+                <p>Upload an image to the device</p>
+            </div>
+            <div class="level-item">
+                <div id="upload-image-input" class="file has-name is-fullwidth">
+                    <label class="file-label">
+                        <input id="image-file-upload-input" class="file-input" type="file" name="image-file" />
+                        <span class="file-cta">
+                            <span class="file-label"> Select image </span>
+                        </span>
+                        <span class="file-name"> No image selected </span>
+                    </label>
+                </div>
+            </div>
+            <div class="level-item">
+                <button class="button is-link" id="upload-button" disabled>Upload</button>
+            </div>
+        </div>
+    </div>
 
-        <footer id="footer">
-            {% block footer %}
-            &copy; Copyright 2025 by <a href="https://ashmanix.com">Ashmanix</a>
-            {% endblock %}
-        </footer>
+    <main id="content" class="container">{% block content %}{% endblock %}</main>
+
+    {% block scripts %}{% endblock %}
+
+    <footer id="footer">
+        {% block footer %}
+        &copy; Copyright 2025 by <a href="https://ashmanix.com">Ashmanix</a>
+        {% endblock %}
+    </footer>
+    <script type="module" src="js/pages/base.js"></script>
     </article>
 </body>
 

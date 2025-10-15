@@ -1,18 +1,22 @@
-<div id="image-list">
+<div>
     {% if not image_list %}
-    <h5>No images saved to the device.</h5>
+    <h5 class="title is-5">No images saved to the device</h5>
     {% endif %}
-    {% for image in image_list %}
-    <article class="image-card">
-        <div class="image-card-details">
-            <h3>Filename: {{ image.filename }}</h3>
-            <h4>ID: {{ image.id }}</h4>
-            <p>Created At: {{ image.created_at|format_datetime }}</p>
+    <div id="image-list" class="grid is-col-min-15">
+        {% for image in image_list %}
+        <div class="cell">
+            <div class="card image-card">
+                <div class="card-content">
+                    <h3 class="title is-3">Filename: {{ image.filename }}</h3>
+                    <h4 class="title is-4">ID: {{ image.id }}</h4>
+                    <p class="subtitle is-5">Created At: {{ image.created_at|format_datetime }}</p>
+                    <div class="buttons">
+                        <button data-id="{{ image.id }}" class="button is-danger delete-image-button">Delete</button>
+                        <button data-id="{{ image.id }}" class="button is-primary set-image-button">Set</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="grid">
-            <button onclick="deleteImage({{image.id}})" class="secondary">Delete</button>
-            <button onclick="setImage({{image.id}})">Set</button>
-        </div>
-    </article>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
