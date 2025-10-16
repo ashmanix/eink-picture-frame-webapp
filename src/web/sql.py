@@ -29,8 +29,19 @@ def get_item(id: int, session: Session) -> PictureFrameImage:
 
 def get_all(session: Session) -> List[PictureFrameImage]:
     statement = select(PictureFrameImage)
-    results = session.exec(statement=statement)
-    return results.all()
+    results = session.exec(statement=statement).all()
+    return results
+
+
+def get_query(session: Session, search: str) -> List[PictureFrameImage]:
+    if not search:
+        return get_all(session)
+
+    statement = select(PictureFrameImage).where(
+        PictureFrameImage.filename.like(f"%{search}%")
+    )
+    results = session.exec(statement).all()
+    return results
 
 
 def add_item(filename: str, session: Session) -> PictureFrameImage:

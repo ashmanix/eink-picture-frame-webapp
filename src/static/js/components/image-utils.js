@@ -1,7 +1,10 @@
-export const updateList = async () => {
+export const updateList = async (search = null) => {
   try {
-    const url = `/image_list/partial`;
-    const response = await fetch(url);
+    const url = new URL(window.location.href + `image_list/partial`);
+    if (search) {
+      url.searchParams.set("search", search);
+    }
+    const response = await fetch(url.toString());
 
     if (!response.ok) throw new Error(`Error getting image list partial`);
     const html = await response.text();

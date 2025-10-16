@@ -4,17 +4,19 @@ from pathlib import Path
 import re
 import os
 import shutil
-from datetime import datetime
+from PIL import Image
 
 from web.display import get_display, display_image
 from web.models import FileError, FileDeletionResults, PictureFrameImage
 from web.constants import FILENAME_VALIDATION_REGEX, IMAGE_FOLDER_LOCATION
-from web.sql import get_item, delete_item, add_item, get_all
+from web.sql import get_item, delete_item, add_item, get_all, get_query
 from sqlmodel import Session
 
 from markupsafe import Markup, escape
 
 display = get_display()
+
+IMAGE_THUMBNAIL_FOLDER = Path(f"{IMAGE_FOLDER_LOCATION}/thumbnails")
 
 
 def check_is_valid_image_type(filename: str) -> bool:
@@ -25,21 +27,41 @@ def check_is_valid_image_type(filename: str) -> bool:
     return False
 
 
+def save_thumbnail(image_file_path: Path, size=(200, 200)):
+    thumbnail_directory = Path(IMAGE_THUMBNAIL_FOLDER)
+    thumbnail_directory.mkdir(exist_ok=True)
+    thumbnail_path = thumbnail_directory / image_file_path.name
+
+    with Image.open(image_file_path) as image:
+        image.thumbnail(size)
+        image.save(thumbnail_path)
+
+
+def delete_thumbnail(image_file_name: str):
+    thumbnail_path = Path(IMAGE_THUMBNAIL_FOLDER / image_file_name)
+    if os.path.exists(thumbnail_path):
+        os.remove(thumbnail_path)
+    else:
+        logger.warning(
+            f"Thumbnail for image: {image_file_name} not found when attempting to delete!"
+        )
+
+
 def delete_image(id: int, session: Session):
     image: PictureFrameImage = get_item(id, session)
     filename = image.filename
     logger.info(f"Attempting to delete file: {filename} from folder.")
 
-    file_location = f"{IMAGE_FOLDER_LOCATION}/{filename}"
-    logger.warning(f"File Location: {file_location}")
-    if not os.path.exists(file_location):
+    image_file_location = Path(f"{IMAGE_FOLDER_LOCATION}/{filename}")
+    if not os.path.exists(image_file_location):
         if image.id is not None:
             delete_item(image.id, session)
         raise FileNotFoundError(
             f"The file {filename} could not be found on the device!"
         )
     else:
-        os.remove(file_location)
+        os.remove(image_file_location)
+        delete_thumbnail(filename)
         delete_item(image.id, session)
         logger.info(f"File: {filename} was successfully removed!")
 
@@ -62,14 +84,16 @@ def delete_image_list(
 def save_image(filename: str, file: IO[bytes], session: Session):
     logger.info(f"Attempting to save file: {filename} to folder")
 
-    file_location = f"{IMAGE_FOLDER_LOCATION}/{filename}"
+    image_file_location = Path(f"{IMAGE_FOLDER_LOCATION}/{filename}")
 
     # Create the images folder for the file if it doesn't already exist
-    file_path = Path(file_location)
+    file_path = Path(image_file_location)
     file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(file_location, "wb") as buffer:
+    with open(image_file_location, "wb") as buffer:
         shutil.copyfileobj(file, buffer)
+
+    save_thumbnail(image_file_location)
 
     add_item(filename, session)
     logger.info(f"File: {filename}, saved!")
@@ -93,7 +117,12 @@ def set_display_image(id: int, session: Session):
         display_image(display, file_location)
 
 
-def get_image_list(session: Session) -> List[PictureFrameImage]:
+def get_image_list(
+    session: Session, search: str | None = None
+) -> List[PictureFrameImage]:
+    if search:
+        return get_query(session, search)
+
     return get_all(session)
 
 

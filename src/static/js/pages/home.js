@@ -6,9 +6,13 @@ import {
 
 const deleteButton = document.getElementById("delete-button");
 const refreshButton = document.getElementById("refresh-list-button");
+const searchButton = document.getElementById("search-button");
+const searchInput = document.getElementById("search-input");
 
 refreshButton.addEventListener("click", async () => {
-  await updateList();
+  const searchValue = searchInput.value;
+  if (searchValue) await updateList(searchValue);
+  else await updateList();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -26,24 +30,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  searchButton.addEventListener("click", (event) => {
+    const searchValue = searchInput.value;
+
+    if (searchValue) {
+      console.log(`Search value: ${searchValue}`);
+      updateList(searchValue);
+    }
+  });
+
+  searchInput.addEventListener("input", (event) => {
+    const value = event.target.value;
+    console.log(`Search value: ${value}`);
+    console.log(`Size: ${value?.length}`);
+    if (value?.length > 2) {
+      searchButton.disabled = false;
+    } else if (value?.length == 0) {
+      updateList();
+    } else {
+      searchButton.disabled = true;
+    }
+  });
 });
-
-const setButtonListeners = () => {
-  document.querySelectorAll(".set-image-button").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      const id = event.target.dataset.id;
-      if (id) {
-        setImage(id);
-      }
-    });
-  });
-
-  document.querySelectorAll(".delete-image-button").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      const id = event.target.dataset.id;
-      if (id) {
-        deleteImage(id);
-      }
-    });
-  });
-};

@@ -44,16 +44,19 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 
 @app.get("/", response_class=HTMLResponse)
-async def root(request: Request, session: SessionDep):
-    image_list: List[PictureFrameImage] = get_image_list(session)
+async def root(request: Request, session: SessionDep, search: str | None = None):
+    image_list: List[PictureFrameImage] = get_image_list(session, search)
     return templates.TemplateResponse(
         request=request, name="home.html", context={"image_list": image_list}
     )
 
 
 @app.get("/image_list/partial")
-async def get_list_partial(request: Request, session: SessionDep):
-    image_list: List[PictureFrameImage] = get_image_list(session)
+async def get_list_partial(
+    request: Request, session: SessionDep, search: str | None = None
+):
+    print(f"Search: {search}")
+    image_list: List[PictureFrameImage] = get_image_list(session, search)
     return templates.TemplateResponse(
         request=request,
         name="partial/image_list.html",

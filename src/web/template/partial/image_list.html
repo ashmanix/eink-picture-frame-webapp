@@ -1,18 +1,28 @@
 <div>
     {% if not image_list %}
-    <h5 class="title is-5">No images saved to the device</h5>
+    <h5 class="title is-5">No images found</h5>
     {% endif %}
-    <div id="image-list" class="grid is-col-min-15">
+    <div id="image-list" class="grid is-col-min-20">
         {% for image in image_list %}
         <div class="cell">
-            <div class="card image-card">
-                <div class="card-content">
-                    <h3 class="title is-3">Filename: {{ image.filename }}</h3>
-                    <h4 class="title is-4">ID: {{ image.id }}</h4>
-                    <p class="subtitle is-5">Created At: {{ image.created_at|format_datetime }}</p>
-                    <div class="buttons">
-                        <button data-id="{{ image.id }}" class="button is-danger delete-image-button">Delete</button>
-                        <button data-id="{{ image.id }}" class="button is-primary set-image-button">Set</button>
+            <div class="columns is-multiline">
+                <div class="column">
+                    <div class="card is-flex is-flex-direction-column" style="height: 100%;">
+                        <div class="card-image thumb-container">
+                            <figure class="image is-4by3">
+                                <img src="/images/thumbnails/{{ image.filename }}" alt="{{ image.name }}" />
+                            </figure>
+                        </div>
+                        <div class="card-content is-flex-grow-1">
+                            <h3 class="title is-3">Filename: {{ image.filename }}</h3>
+                            <h4 class="title is-4">ID: {{ image.id }}</h4>
+                            <p class="subtitle is-5">Created At: {{ image.created_at|format_datetime }}</p>
+                        </div>
+                        <footer class="card-footer">
+                            <a data-id="{{ image.id }}"
+                                class="card-footer-item is-danger delete-image-button">Delete</a>
+                            <a data-id="{{ image.id }}" class="card-footer-item is-primary set-image-button">Set</a>
+                        </footer>
                     </div>
                 </div>
             </div>
