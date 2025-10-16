@@ -42,6 +42,7 @@ IMAGE_FOLDER_LOCATION.mkdir(parents=True, exist_ok=True)
 app.mount("/images", StaticFiles(directory="src/static/images"), name="images")
 
 app.mount("/css", StaticFiles(directory="src/static/css"), name="css")
+app.mount("/webfonts", StaticFiles(directory="src/static/webfonts"), name="webfonts")
 app.mount("/js", StaticFiles(directory="src/static/js"), name="js")
 templates = Jinja2Templates(directory="src/web/template")
 templates.env.filters["format_datetime"] = format_datetime

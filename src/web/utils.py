@@ -37,7 +37,7 @@ def check_if_file_exists(filename: str) -> bool:
     return os.path.exists(image_file_path)
 
 
-def save_thumbnail(image_file_path: Path, size=(200, 200)):
+def save_thumbnail(image_file_path: Path, size=(128, 128)):
     thumbnail_directory = Path(IMAGE_THUMBNAIL_FOLDER)
     thumbnail_directory.mkdir(exist_ok=True)
     thumbnail_path = thumbnail_directory / image_file_path.name

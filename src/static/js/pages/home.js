@@ -22,6 +22,7 @@ refreshButton.addEventListener("click", async () => {
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector("#image-list-container");
   container.addEventListener("click", async (event) => {
+    console.log("TARGET: ", event.target);
     if (event.target.matches(".set-image-button")) {
       const id = event.target.dataset.id;
       if (id) {

@@ -35,10 +35,26 @@ body {
     display: none;
 }
 
+.image-list-item {
+    height: 150px;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.list-item-image {}
 
 .thumb-container {
-    max-height: 180px;
+    width: 150px;
+    max-height: 128px;
     overflow: hidden;
+}
+
+.thumb-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .responsive-card {

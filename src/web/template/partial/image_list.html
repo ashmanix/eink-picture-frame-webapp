@@ -2,33 +2,35 @@
     {% if not image_list %}
     <h5 class="title is-5">No images found</h5>
     {% endif %}
-    <div id="image-list" class="grid is-col-min-20 image-card-list">
+    <div id="image-list">
+        <hr />
         {% for image in image_list %}
-        <div class="column">
-            <div class="card responsive-card" style="height: 100%;">
-                <header class="card-header">
-                    <p class="card-header-title">{{ image.filename }}</p>
-                    <button class="card-header-icon" aria-label="more options">
-                        <span class="icon">
-                            <i class="fas fa-angle-down" aria-hidden="true"></i>
-                        </span>
-                    </button>
-                </header>
-                <div class="card-image thumb-container">
-                    <figure class="image is-4by3">
-                        <img src="/images/thumbnails/{{ image.filename }}" alt="{{ image.name }}" />
-                    </figure>
-                </div>
-                <div class="card-content is-flex-grow-1">
-                    <h5 class="title is-5">ID: {{ image.id }}</h5>
-                    <p class="subtitle is-6">Created At: {{ image.created_at|format_datetime }}</p>
-                </div>
-                <footer class="card-footer">
-                    <a data-id="{{ image.id }}" class="card-footer-item is-danger delete-image-button">Delete</a>
-                    <a data-id="{{ image.id }}" class="card-footer-item is-primary set-image-button">Set</a>
-                </footer>
+        <article class="media image-list-items">
+            <figure class="media-left">
+                <p class="image thumb-container is-128x128">
+                    <img src="/images/thumbnails/{{image.filename}}" alt="{{image.filename}}">
+                </p>
+            </figure>
+            <div class="media-content">
+                <p class="is-title is-size-4">{{image.filename}}</p>
+                <p class="is-size-5">ID: {{image.id}}</p>
+                <p class="has-text-grey is-size-5">Uploaded: {{image.created_at|format_datetime}}</p>
             </div>
-        </div>
+            <nav class="level is-mobile">
+                <div class="level-left">
+                    <a class="level-item is-danger" title="Delete image from device">
+                        <span class="icon is-large has-text-danger"><i
+                                class="fas fa-2x fa-circle-minus delete-image-button"
+                                data-id="{{ image.id }}"></i></span>
+                    </a>
+                    <a class="level-item" data-id="{{ image.id }}" title="Set as current image">
+                        <span class="icon is-large has-text-success "><i
+                                class="fas fa-2x fa-circle-check set-image-button" data-id="{{ image.id }}"></i></span>
+                    </a>
+                </div>
+            </nav>
+        </article>
+        <hr />
         {% endfor %}
     </div>
 </div>
