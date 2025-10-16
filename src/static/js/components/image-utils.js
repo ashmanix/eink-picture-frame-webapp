@@ -79,6 +79,7 @@ export const uploadImage = async (file) => {
     const data = await response.json();
     console.log("Uploaded:", data);
     await updateAllDetails();
+    return true;
   } catch (error) {
     console.error("Upload failed:", error);
   }

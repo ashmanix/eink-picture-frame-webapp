@@ -2,9 +2,9 @@ import {
   updateList,
   deleteImage,
   setImage,
+  uploadImage,
 } from "../components/image-utils.js";
 
-const deleteButton = document.getElementById("delete-button");
 const refreshButton = document.getElementById("refresh-list-button");
 const searchButton = document.getElementById("search-button");
 const searchInput = document.getElementById("search-input");
@@ -21,17 +21,17 @@ refreshButton.addEventListener("click", async () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector("#image-list-container");
-  container.addEventListener("click", (event) => {
+  container.addEventListener("click", async (event) => {
     if (event.target.matches(".set-image-button")) {
       const id = event.target.dataset.id;
       if (id) {
-        setImage(id);
+        await setImage(id);
       }
     } else if (event.target.matches(".delete-image-button")) {
       const id = event.target.dataset.id;
       if (id) {
-        deleteImage(id);
-        updateAllDetails();
+        await deleteImage(id);
+        await updateAllDetails();
       }
     }
   });
@@ -58,9 +58,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
   searchInput.addEventListener("keyup", (event) => {
     if (event.key === "Enter") {
-      // Do something
-      console.log("Enter pressed!");
       if (searchButton.disabled === false) runImageSearch();
     }
   });
+});
+
+const uploadButton = document.getElementById("upload-button");
+const fileInput = document.querySelector(
+  "#upload-image-input input[type=file]"
+);
+const fileName = document.querySelector("#upload-image-input .file-name");
+
+let file = null;
+
+fileInput.onchange = () => {
+  if (fileInput.isDefaultNamespace.length > 0) {
+    file = fileInput.files[0];
+    fileName.textContent = file.name;
+    uploadButton.disabled = false;
+  } else {
+    console.log("Yo");
+  }
+};
+
+uploadButton.addEventListener("click", async () => {
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("Choose a file first!");
+    return;
+  }
+
+  await uploadImage(file);
+  fileInput.value = "";
+  fileName.textContent = "No Image Selected";
+  uploadButton.disabled = true;
 });

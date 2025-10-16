@@ -15,3 +15,5 @@ images
 
 # MacOS-generated filers
 .DS_store
+
+*.db
