@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-from web.models import PictureFrameImage
+from web.models import PictureFrameImage, StorageSpaceDetails
 from web.sql import create_db_and_tables, get_all, get_session
 from dotenv import load_dotenv
 from sqlmodel import Session
@@ -12,6 +12,7 @@ from sqlmodel import Session
 import traceback
 
 from web.utils import (
+    check_if_file_exists,
     delete_image,
     save_image,
     set_display_image,
@@ -19,6 +20,7 @@ from web.utils import (
     delete_image_list,
     get_image_list,
     format_datetime,
+    get_remaining_storage_space,
 )
 
 from web.constants import FILENAME_VALIDATION_REGEX
@@ -46,22 +48,50 @@ SessionDep = Annotated[Session, Depends(get_session)]
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request, session: SessionDep, search: str | None = None):
     image_list: List[PictureFrameImage] = get_image_list(session, search)
+    storage = get_remaining_storage_space()
     return templates.TemplateResponse(
-        request=request, name="home.html", context={"image_list": image_list}
+        request=request,
+        name="home.html",
+        context={"image_list": image_list, "storage": storage},
     )
+
+
+@app.get("/storage/partial")
+async def get_storage_partial(request: Request):
+    try:
+        storage = get_remaining_storage_space()
+        return templates.TemplateResponse(
+            request=request,
+            name="partial/storage_space.html",
+            context={"storage": storage},
+        )
+    except Exception as err:
+        handle_error(err, f"Error getting partial list: {err}")
 
 
 @app.get("/image_list/partial")
 async def get_list_partial(
     request: Request, session: SessionDep, search: str | None = None
 ):
-    print(f"Search: {search}")
-    image_list: List[PictureFrameImage] = get_image_list(session, search)
-    return templates.TemplateResponse(
-        request=request,
-        name="partial/image_list.html",
-        context={"image_list": image_list},
-    )
+    try:
+        image_list: List[PictureFrameImage] = get_image_list(session, search)
+        return templates.TemplateResponse(
+            request=request,
+            name="partial/image_list.html",
+            context={"image_list": image_list},
+        )
+    except Exception as err:
+        handle_error(err, f"Error getting partial list: {err}")
+
+
+@app.get("/storage_space")
+async def get_storage_space():
+    try:
+        storage = get_remaining_storage_space()
+        return storage
+
+    except Exception as err:
+        handle_error(err, f"Error getting partial list: {err}")
 
 
 @app.get("/image_list")
@@ -106,6 +136,8 @@ async def upload_image(session: SessionDep, file: UploadFile = File(...)):
         file = file.file
         if not check_is_valid_image_type(filename):
             raise TypeError(f"{filename} is not a valid image file type!")
+        if check_if_file_exists(filename):
+            raise RuntimeError(f"{filename} is already on device!")
         save_image(filename, file, session)
         return {"result": "success"}
     except Exception as err:

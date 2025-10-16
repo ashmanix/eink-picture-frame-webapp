@@ -1,4 +1,4 @@
-import { updateList } from "../components/image-utils.js";
+import { updateAllDetails, uploadImage } from "../components/image-utils.js";
 const uploadButton = document.getElementById("upload-button");
 const fileInput = document.querySelector(
   "#upload-image-input input[type=file]"
@@ -22,22 +22,24 @@ uploadButton.addEventListener("click", async () => {
     return;
   }
 
-  const form = new FormData();
-  form.append("file", file);
+  await uploadImage(file);
 
-  try {
-    const url = "/image/upload";
-    const response = await fetch(url, {
-      method: "POST",
-      body: form,
-    });
+  // const form = new FormData();
+  // form.append("file", file);
 
-    if (!response.ok) throw new Error("Error uploading image!");
-    const data = await response.json();
-    console.log("Uploaded:", data);
-    updateList();
-  } catch (error) {
-    console.error("Upload failed:", error);
-    alert("Upload failed.");
-  }
+  // try {
+  //   const url = "/image/upload";
+  //   const response = await fetch(url, {
+  //     method: "POST",
+  //     body: form,
+  //   });
+
+  //   if (!response.ok) throw new Error("Error uploading image!");
+  //   const data = await response.json();
+  //   console.log("Uploaded:", data);
+  //   await updateAllDetails();
+  // } catch (error) {
+  //   console.error("Upload failed:", error);
+  //   alert("Upload failed.");
+  // }
 });

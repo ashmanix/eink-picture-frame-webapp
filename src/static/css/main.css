@@ -14,44 +14,41 @@ main {
     flex: 1;
 }
 
-footer {
+.main-footer {
     padding-top: 2rem;
     padding-bottom: 2rem;
+    margin-right: 1rem;
+    margin-left: 1rem;
 }
 
-.main-article {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-}
+/* .main-section {
+    margin-right: 1rem;
+    margin-left: 1rem;
+} */
 
 .top-bar {
     padding-top: 1rem;
 }
 
-#content {
-    /* flex: 1; */
-}
-
-#list-of-cards {
-    position: relative;
-}
 
 .loading {
     display: none;
 }
 
-.image-card {
-    height: 100%;
-}
 
 .thumb-container {
     max-height: 180px;
     overflow: hidden;
 }
 
-.image-card-buttons {
-    align-content: flex-end;
-    justify-self: flex-end;
-    flex: 3;
+.responsive-card {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.image-card-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
 }

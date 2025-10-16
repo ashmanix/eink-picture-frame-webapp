@@ -1,6 +1,6 @@
 export const updateList = async (search = null) => {
   try {
-    const url = new URL(window.location.href + `image_list/partial`);
+    const url = new URL(globalThis.location.href + `image_list/partial`);
     if (search) {
       url.searchParams.set("search", search);
     }
@@ -12,8 +12,26 @@ export const updateList = async (search = null) => {
     document.getElementById("image-list-container").innerHTML = html;
   } catch (error) {
     console.error("Image partial retrieval failed:", error);
-    alert("Image partial retrieval failed.");
   }
+};
+
+export const updateStorageDetails = async () => {
+  try {
+    const url = new URL(globalThis.location.href + `storage/partial`);
+    const response = await fetch(url.toString());
+
+    if (!response.ok) throw new Error(`Error getting storage partial`);
+    const html = await response.text();
+
+    document.getElementById("storage-details-container").innerHTML = html;
+  } catch (error) {
+    console.error("Storafe partial retrieval failed:", error);
+  }
+};
+
+export const updateAllDetails = async () => {
+  await updateList();
+  await updateStorageDetails();
 };
 
 export const deleteImage = async (id) => {
@@ -30,7 +48,7 @@ export const deleteImage = async (id) => {
     console.error("Deletion failed:", error);
     alert("Deletion failed.");
   } finally {
-    updateList();
+    updateAllDetails();
   }
 };
 
@@ -43,5 +61,25 @@ export const setImage = async (id) => {
     }
   } catch (error) {
     console.error(error);
+  }
+};
+
+export const uploadImage = async (file) => {
+  const form = new FormData();
+  form.append("file", file);
+
+  try {
+    const url = "/image/upload";
+    const response = await fetch(url, {
+      method: "POST",
+      body: form,
+    });
+
+    if (!response.ok) throw new Error("Error uploading image!");
+    const data = await response.json();
+    console.log("Uploaded:", data);
+    await updateAllDetails();
+  } catch (error) {
+    console.error("Upload failed:", error);
   }
 };

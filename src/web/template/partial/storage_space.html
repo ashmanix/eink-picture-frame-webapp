@@ -1,0 +1,12 @@
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <p>Device Storage: {{storage.used}}/{{storage.total}} GB</p>
+        </div>
+    </div>
+    <div class="level-item">
+        <progress class="progress {{storage.class_type}}" value="{{storage.percent}}" max="100">
+            {{storage.percent}}%
+        </progress>
+    </div>
+</div>

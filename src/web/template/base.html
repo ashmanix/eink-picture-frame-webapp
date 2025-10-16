@@ -19,35 +19,36 @@
             </p>
         </header>
     </div>
-
-    <div class="level top-level top-bar">
-        <div class="level-left"></div>
-        <div class="level-right">
-            <div class="level-item">
-                <p>Upload an image to the device</p>
-            </div>
-            <div class="level-item">
-                <div id="upload-image-input" class="file has-name is-fullwidth">
-                    <label class="file-label">
-                        <input id="image-file-upload-input" class="file-input" type="file" name="image-file" />
-                        <span class="file-cta">
-                            <span class="file-label"> Select image </span>
-                        </span>
-                        <span class="file-name"> No image selected </span>
-                    </label>
+    <section class="section">
+        <!-- 
+        <div class="level top-level top-bar">
+            <div class="level-left"></div>
+            <div class="level-right">
+                <div class="level-item">
+                    <p>Upload an image to the device</p>
+                </div>
+                <div class="level-item">
+                    <div id="upload-image-input" class="file has-name is-fullwidth">
+                        <label class="file-label">
+                            <input id="image-file-upload-input" class="file-input" type="file" name="image-file" />
+                            <span class="file-cta">
+                                <span class="file-label"> Select image </span>
+                            </span>
+                            <span class="file-name"> No image selected </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="level-item">
+                    <button class="button is-link" id="upload-button" disabled>Upload</button>
                 </div>
             </div>
-            <div class="level-item">
-                <button class="button is-link" id="upload-button" disabled>Upload</button>
-            </div>
-        </div>
-    </div>
+        </div> -->
 
-    <main id="content" class="container">{% block content %}{% endblock %}</main>
-
+        <main id="content" class="container">{% block content %}{% endblock %}</main>
+    </section>
     {% block scripts %}{% endblock %}
 
-    <footer id="footer">
+    <footer id="footer" class="main-footer">
         {% block footer %}
         &copy; Copyright 2025 by <a href="https://ashmanix.com">Ashmanix</a>
         {% endblock %}

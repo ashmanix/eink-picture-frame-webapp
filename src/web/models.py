@@ -36,3 +36,10 @@ class PictureFrameImage(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     filename: str = Field(index=True)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class StorageSpaceDetails(BaseModel):
+    total: float
+    used: float
+    percent: float
+    class_type: str = "is-success"

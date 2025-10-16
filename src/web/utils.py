@@ -7,7 +7,12 @@ import shutil
 from PIL import Image
 
 from web.display import get_display, display_image
-from web.models import FileError, FileDeletionResults, PictureFrameImage
+from web.models import (
+    FileError,
+    FileDeletionResults,
+    PictureFrameImage,
+    StorageSpaceDetails,
+)
 from web.constants import FILENAME_VALIDATION_REGEX, IMAGE_FOLDER_LOCATION
 from web.sql import get_item, delete_item, add_item, get_all, get_query
 from sqlmodel import Session
@@ -25,6 +30,11 @@ def check_is_valid_image_type(filename: str) -> bool:
     if is_match:
         return True
     return False
+
+
+def check_if_file_exists(filename: str) -> bool:
+    image_file_path = Path(f"{IMAGE_FOLDER_LOCATION}/{filename}")
+    return os.path.exists(image_file_path)
 
 
 def save_thumbnail(image_file_path: Path, size=(200, 200)):
@@ -128,3 +138,24 @@ def get_image_list(
 
 def format_datetime(value, format="%d-%m-%Y %H:%M"):
     return value.strftime(format)
+
+
+def get_remaining_storage_space() -> StorageSpaceDetails:
+    path = Path(IMAGE_THUMBNAIL_FOLDER)
+    total, used, free = shutil.disk_usage(path)
+
+    percentage_value = round(used / total * 100)
+
+    class_type = "is-success"
+
+    if percentage_value > 60 and percentage_value <= 79:
+        class_type = "is-warning"
+    elif percentage_value > 80:
+        class_type = "is-danger"
+
+    return StorageSpaceDetails(
+        percent=percentage_value,
+        used=round(used / (1024**3), 2),
+        total=round(total / (1024**3), 2),
+        class_type=class_type,
+    )
