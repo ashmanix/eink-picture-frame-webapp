@@ -1,6 +1,6 @@
 <div class="level">
     <div class="level-item">
-        <p>Storage: {{storage.used}}/{{storage.total}} GB</p>
+        <p>Storage Available: {{storage.total - storage.used}} GB</p>
     </div>
     <progress class="progress {{storage.class_type}}" value="{{storage.percent}}" max="100">
         {{storage.percent}}%
