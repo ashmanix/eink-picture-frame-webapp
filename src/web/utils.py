@@ -97,8 +97,8 @@ def save_image(filename: str, file: IO[bytes], session: Session):
     image_file_location = Path(f"{IMAGE_FOLDER_LOCATION}/{filename}")
 
     # Create the images folder for the file if it doesn't already exist
-    file_path = Path(image_file_location)
-    file_path.parent.mkdir(parents=True, exist_ok=True)
+    # file_path = Path(image_file_location)
+    # file_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(image_file_location, "wb") as buffer:
         shutil.copyfileobj(file, buffer)
@@ -141,7 +141,7 @@ def format_datetime(value, format="%d-%m-%Y %H:%M"):
 
 
 def get_remaining_storage_space() -> StorageSpaceDetails:
-    path = Path(IMAGE_THUMBNAIL_FOLDER)
+    path = Path(IMAGE_FOLDER_LOCATION)
     total, used, free = shutil.disk_usage(path)
 
     percentage_value = round(used / total * 100)

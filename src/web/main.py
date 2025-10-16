@@ -23,7 +23,7 @@ from web.utils import (
     get_remaining_storage_space,
 )
 
-from web.constants import FILENAME_VALIDATION_REGEX
+from web.constants import IMAGE_FOLDER_LOCATION
 
 from .logger import logger
 
@@ -35,7 +35,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+# Create directory if it doesnt already exist
+IMAGE_FOLDER_LOCATION.mkdir(parents=True, exist_ok=True)
+
 app.mount("/images", StaticFiles(directory="src/static/images"), name="images")
+
 app.mount("/css", StaticFiles(directory="src/static/css"), name="css")
 app.mount("/js", StaticFiles(directory="src/static/js"), name="js")
 templates = Jinja2Templates(directory="src/web/template")
