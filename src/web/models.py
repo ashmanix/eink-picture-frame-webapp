@@ -42,4 +42,5 @@ class StorageSpaceDetails(BaseModel):
     total: float
     used: float
     percent: float
+    free: float
     class_type: str = "is-success"

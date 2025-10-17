@@ -1,8 +1,9 @@
 <div class="level">
     <div class="level-item">
-        <p>Storage Available: {{storage.total - storage.used}} GB</p>
+        <p>Storage Available: {{storage.free|round}} GB</p>
     </div>
     <progress class="progress {{storage.class_type}}" value="{{storage.percent}}" max="100">
         {{storage.percent}}%
     </progress>
+    <span class="loader-mixin"></span>
 </div>

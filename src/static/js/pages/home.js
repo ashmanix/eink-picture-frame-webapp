@@ -9,31 +9,65 @@ const refreshButton = document.getElementById("refresh-list-button");
 const searchButton = document.getElementById("search-button");
 const searchInput = document.getElementById("search-input");
 
-const runImageSearch = async () => {
-  const searchValue = searchInput.value;
-  if (searchValue) await updateList(searchValue);
-  else await updateList();
+const runImageSearch = async (value = null, clearList = null) => {
+  searchButton.classList.toggle("is-loading");
+
+  if (clearList) {
+    await updateList();
+  } else {
+    const searchValue = value ?? searchInput.value;
+    if (searchValue) await updateList(searchValue);
+    else await updateList();
+  }
+
+  searchButton.classList.toggle("is-loading");
+};
+
+const toggleEnableImageButtons = (id, enable) => {
+  const deleteButton = document.querySelector(
+    `.delete-image-button[data-id="${id}"]`
+  );
+
+  const setButton = document.querySelector(
+    `.set-image-button[data-id="${id}"]`
+  );
+
+  const progressBar = document.querySelector(`.progress[data-id="${id}"]`);
+
+  enable
+    ? progressBar.classList.add("is-invisible")
+    : progressBar.classList.remove("is-invisible");
+
+  for (const btn of [deleteButton, setButton]) {
+    if (btn) btn.disabled = !enable;
+  }
 };
 
 refreshButton.addEventListener("click", async () => {
+  refreshButton.classList.toggle("is-loading");
   await runImageSearch();
+  refreshButton.classList.toggle("is-loading");
 });
 
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector("#image-list-container");
   container.addEventListener("click", async (event) => {
-    console.log("TARGET: ", event.target);
-    if (event.target.matches(".set-image-button")) {
-      const id = event.target.dataset.id;
-      if (id) {
-        await setImage(id);
-      }
-    } else if (event.target.matches(".delete-image-button")) {
-      const id = event.target.dataset.id;
-      if (id) {
-        await deleteImage(id);
-        await updateAllDetails();
-      }
+    const setButton = event.target.closest(".set-image-button");
+    if (setButton) {
+      const id = setButton.dataset.id;
+      console.log("SET: ", id);
+      toggleEnableImageButtons(id, false);
+      await setImage(id);
+      toggleEnableImageButtons(id, true);
+    }
+
+    const deleteButton = event.target.closest(".delete-image-button");
+    if (deleteButton) {
+      const id = deleteButton.dataset.id;
+      console.log("DELETE: ", id);
+      toggleEnableImageButtons(id, false);
+      await deleteImage(id);
+      await updateAllDetails();
     }
   });
 
@@ -42,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (searchValue) {
       console.log(`Search value: ${searchValue}`);
-      updateList(searchValue);
+      runImageSearch(searchValue);
     }
   });
 
@@ -51,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (value?.length > 2) {
       searchButton.disabled = false;
     } else if (value?.length == 0) {
-      updateList();
+      runImageSearch(null, true);
     } else {
       searchButton.disabled = true;
     }
@@ -83,9 +117,11 @@ fileInput.onchange = () => {
 };
 
 uploadButton.addEventListener("click", async () => {
+  uploadButton.classList.toggle("is-loading");
   const file = fileInput.files[0];
   if (!file) {
     alert("Choose a file first!");
+    uploadButton.classList.toggle("is-loading");
     return;
   }
 
@@ -93,4 +129,5 @@ uploadButton.addEventListener("click", async () => {
   fileInput.value = "";
   fileName.textContent = "No Image Selected";
   uploadButton.disabled = true;
+  uploadButton.classList.toggle("is-loading");
 });

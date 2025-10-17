@@ -5,7 +5,7 @@
     <div id="image-list">
         <hr />
         {% for image in image_list %}
-        <article class="media image-list-items">
+        <article class="media image-list-items is-disabled">
             <figure class="media-left">
                 <p class="image thumb-container is-128x128">
                     <img src="/images/thumbnails/{{image.filename}}" alt="{{image.filename}}">
@@ -15,18 +15,25 @@
                 <p class="is-title is-size-4">{{image.filename}}</p>
                 <p class="is-size-5">ID: {{image.id}}</p>
                 <p class="has-text-grey is-size-5">Uploaded: {{image.created_at|format_datetime}}</p>
+                <progress class="progress is-small is-primary mt-5 is-invisible" data-id="{{ image.id }}"
+                    max="100"></progress>
             </div>
             <nav class="level is-mobile">
                 <div class="level-left">
-                    <a class="level-item is-danger" title="Delete image from device">
-                        <span class="icon is-large has-text-danger"><i
-                                class="fas fa-2x fa-circle-minus delete-image-button"
-                                data-id="{{ image.id }}"></i></span>
-                    </a>
-                    <a class="level-item" data-id="{{ image.id }}" title="Set as current image">
-                        <span class="icon is-large has-text-success "><i
-                                class="fas fa-2x fa-circle-check set-image-button" data-id="{{ image.id }}"></i></span>
-                    </a>
+                    <div class="level-item">
+                        <button class="button delete-image-button" title="Delete image from device"
+                            data-id="{{ image.id }}">
+                            <span class="icon is-small has-text-danger">
+                                <i class="fas fa-xmark"></i>
+                            </span>
+                        </button>
+                    </div>
+                    <button class="level-item button set-image-button" title="Set as current image"
+                        data-id="{{ image.id }}">
+                        <span class="icon is-small has-text-success">
+                            <i class="fas fa-check"></i>
+                        </span>
+                    </button>
                 </div>
             </nav>
         </article>

@@ -157,5 +157,6 @@ def get_remaining_storage_space() -> StorageSpaceDetails:
         percent=percentage_value,
         used=round(used / (1024**3), 2),
         total=round(total / (1024**3), 2),
+        free=round(free / (1024**3), 2),
         class_type=class_type,
     )
