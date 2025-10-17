@@ -3,7 +3,10 @@ import {
   deleteImage,
   setImage,
   uploadImage,
+  updateAllDetails,
 } from "../components/image-utils.js";
+
+import { setNotification } from "../pages/base.js";
 
 const refreshButton = document.getElementById("refresh-list-button");
 const searchButton = document.getElementById("search-button");
@@ -16,8 +19,12 @@ const runImageSearch = async (value = null, clearList = null) => {
     await updateList();
   } else {
     const searchValue = value ?? searchInput.value;
-    if (searchValue) await updateList(searchValue);
-    else await updateList();
+    if (searchValue) {
+      const result = await updateList(searchValue);
+      if (result?.error) {
+        setNotification("Error searching image list!", "is-danger");
+      }
+    } else await updateList();
   }
 
   searchButton.classList.toggle("is-loading");
@@ -55,18 +62,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const setButton = event.target.closest(".set-image-button");
     if (setButton) {
       const id = setButton.dataset.id;
-      console.log("SET: ", id);
+      const filename = setButton.dataset.filename;
       toggleEnableImageButtons(id, false);
-      await setImage(id);
+      const result = await setImage(id);
       toggleEnableImageButtons(id, true);
+      if (result?.error) {
+        setNotification(`Error setting image: ${filename}`, "is-danger");
+      } else {
+        setNotification(`Image: ${filename} set successfully!`, "is-success");
+      }
     }
 
     const deleteButton = event.target.closest(".delete-image-button");
     if (deleteButton) {
       const id = deleteButton.dataset.id;
-      console.log("DELETE: ", id);
+      const filename = deleteButton.dataset.filename;
       toggleEnableImageButtons(id, false);
-      await deleteImage(id);
+      const result = await deleteImage(id);
+      if (result.error) {
+        setNotification(`Error deleting image: ${filename}`, "is-danger");
+      } else {
+        setNotification(
+          `Image: ${filename} deleted successfully!`,
+          "is-success"
+        );
+      }
       await updateAllDetails();
     }
   });
@@ -75,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchValue = searchInput.value;
 
     if (searchValue) {
-      console.log(`Search value: ${searchValue}`);
       runImageSearch(searchValue);
     }
   });
@@ -111,21 +130,26 @@ fileInput.onchange = () => {
     file = fileInput.files[0];
     fileName.textContent = file.name;
     uploadButton.disabled = false;
-  } else {
-    console.log("Yo");
   }
 };
 
 uploadButton.addEventListener("click", async () => {
   uploadButton.classList.toggle("is-loading");
   const file = fileInput.files[0];
+  const filename = file?.name;
   if (!file) {
-    alert("Choose a file first!");
+    setNotification(`Select a file first.`, "is-warning");
     uploadButton.classList.toggle("is-loading");
     return;
   }
 
-  await uploadImage(file);
+  const result = await uploadImage(file);
+
+  if (result?.error) {
+    setNotification(`Error uploading image: ${filename}`, "is-danger");
+  } else {
+    setNotification(`Image: ${filename} uploaded successfully!`, "is-success");
+  }
   fileInput.value = "";
   fileName.textContent = "No Image Selected";
   uploadButton.disabled = true;

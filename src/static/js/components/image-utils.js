@@ -10,8 +10,10 @@ export const updateList = async (search = null) => {
     const html = await response.text();
 
     document.getElementById("image-list-container").innerHTML = html;
+    return true;
   } catch (error) {
     console.error("Image partial retrieval failed:", error);
+    return { error: error };
   }
 };
 
@@ -24,8 +26,10 @@ export const updateStorageDetails = async () => {
     const html = await response.text();
 
     document.getElementById("storage-details-container").innerHTML = html;
+    return true;
   } catch (error) {
     console.error("Storafe partial retrieval failed:", error);
+    return { error: error };
   }
 };
 
@@ -44,9 +48,10 @@ export const deleteImage = async (id) => {
     if (!response.ok) throw new Error(`Error deleting image ID: ${id}`);
     const data = await response.json();
     console.log("Deleted:", data);
+    return true;
   } catch (error) {
     console.error("Deletion failed:", error);
-    alert("Deletion failed.");
+    return { error: error };
   } finally {
     updateAllDetails();
   }
@@ -59,8 +64,10 @@ export const setImage = async (id) => {
     if (!response.ok) {
       throw new Error(`Error trying to set image to image ID: ${id}`);
     }
+    return true;
   } catch (error) {
     console.error(error);
+    return { error: error };
   }
 };
 
@@ -76,11 +83,11 @@ export const uploadImage = async (file) => {
     });
 
     if (!response.ok) throw new Error("Error uploading image!");
-    const data = await response.json();
-    console.log("Uploaded:", data);
+    const result = await response.json();
     await updateAllDetails();
     return true;
   } catch (error) {
     console.error("Upload failed:", error);
+    return { error: error };
   }
 };

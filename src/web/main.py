@@ -1,4 +1,3 @@
-from time import sleep
 from typing import Annotated, List
 from fastapi import FastAPI, Path, HTTPException, UploadFile, File, Request, Depends
 from fastapi.templating import Jinja2Templates
@@ -127,7 +126,6 @@ async def delete(
     session: SessionDep,
 ):
     try:
-        sleep(2)
         delete_image(id, session)
         return {"result": "successful"}
 
@@ -157,7 +155,6 @@ async def set_current(
     id: int,
     session: SessionDep,
 ):
-    sleep(2)
     try:
         set_display_image(id, session)
         return {"result": "successful"}

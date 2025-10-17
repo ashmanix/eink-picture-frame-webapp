@@ -22,14 +22,14 @@
                 <div class="level-left">
                     <div class="level-item">
                         <button class="button delete-image-button" title="Delete image from device"
-                            data-id="{{ image.id }}">
+                            data-id="{{ image.id }}" data-filename="{{ image.filename }}">
                             <span class="icon is-small has-text-danger">
                                 <i class="fas fa-xmark"></i>
                             </span>
                         </button>
                     </div>
                     <button class="level-item button set-image-button" title="Set as current image"
-                        data-id="{{ image.id }}">
+                        data-id="{{ image.id }}" data-filename="{{ image.filename }}">
                         <span class="icon is-small has-text-success">
                             <i class="fas fa-check"></i>
                         </span>

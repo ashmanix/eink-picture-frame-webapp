@@ -14,6 +14,13 @@ body {
     flex: 1;
 }
 
+.notification-section {
+    padding: 4rem 1rem 1rem 1rem;
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+}
+
 .main-footer {
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -21,28 +28,9 @@ body {
     margin-left: 1rem;
 }
 
-/* .main-section {
-    margin-right: 1rem;
-    margin-left: 1rem;
-} */
-
 .top-bar {
     padding-top: 1rem;
 }
-
-
-.loading {
-    display: none;
-}
-
-.image-list-item {
-    height: 150px;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    margin-top: 1rem;
-}
-
-.list-item-image {}
 
 .thumb-container {
     width: 150px;
@@ -56,16 +44,4 @@ body {
     object-fit: cover;
     object-position: center;
     border-radius: 10px;
-}
-
-.responsive-card {
-    width: 100%;
-    max-width: 320px;
-    margin: 0 auto;
-}
-
-.image-card-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
 }
