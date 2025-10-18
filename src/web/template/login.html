@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{%block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+
+<form class="container is-max-tablet">
+    <div class="notification is-link">
+        <p class="title">Login</p>
+        <p class="subtitle">You need to login to access the app</p>
+
+        <div class="field">
+            <label class="label">Username</label>
+            <div class="control has-icons-left has-icons-right">
+                <input required id="username-input" name="username" class="input" type="text" placeholder="Username"
+                    autocomplete="username">
+                <span class="icon is-small is-left">
+                    <i class="fas fa-user"></i>
+                </span>
+            </div>
+            <p id="username-helper" class="help is-danger is-hidden">This field is required</p>
+        </div>
+
+        <div class="field">
+            <label class="label">Password</label>
+            <div class="control has-icons-left has-icons-right">
+                <input required id="password-input" name="password" class="input" type="password" placeholder="Password"
+                    autocomplete="password">
+                <span class="icon is-small is-left">
+                    <i class="fas fa-key"></i>
+                </span>
+            </div>
+            <p id="password-helper" class="help is-danger is-hidden">This field is required</p>
+        </div>
+
+        <div class="control">
+            <button class="button is-primary" id="login-button">Login</button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+{% block scripts %}
+<script type="module" src="js/pages/login.js"></script>
+{% endblock %}

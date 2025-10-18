@@ -4,7 +4,7 @@ import {
   setImage,
   uploadImage,
   updateAllDetails,
-} from "../components/image-utils.js";
+} from "../utils/api.js";
 
 import {
   openModal,
@@ -12,6 +12,8 @@ import {
   closeAllModals,
   attachModelCloseEvents,
 } from "../components/modal.js";
+
+import { createErrorMessage } from "../utils/messages.js";
 
 import { setNotification } from "../pages/base.js";
 
@@ -74,8 +76,10 @@ refreshButton.addEventListener("click", async () => {
   refreshButton.classList.toggle("is-loading");
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   attachModelCloseEvents();
+
+  await runImageSearch();
 
   const container = document.querySelector("#image-list-container");
   container.addEventListener("click", async (event) => {
@@ -201,9 +205,3 @@ uploadButton.addEventListener("click", async () => {
   uploadButton.disabled = true;
   uploadButton.classList.toggle("is-loading");
 });
-
-const createErrorMessage = (msg, result) => {
-  return `${msg} ${
-    result?.detail ? `<br/><strong>Reason:</strong> ${result.detail}` : ""
-  }`;
-};

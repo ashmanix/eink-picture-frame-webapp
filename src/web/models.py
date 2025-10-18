@@ -44,3 +44,8 @@ class StorageSpaceDetails(BaseModel):
     percent: float
     free: float
     class_type: str = "is-success"
+
+
+class LoginBody(BaseModel):
+    username: str
+    password: str

@@ -1,18 +1,25 @@
 from time import sleep
 from typing import Annotated, List
-from fastapi import FastAPI, Path, HTTPException, UploadFile, File, Request, Depends
+from fastapi import (
+    FastAPI,
+    Path,
+    HTTPException,
+    UploadFile,
+    File,
+    Request,
+    Depends,
+    status,
+    Form,
+)
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-from web.models import PictureFrameImage, StorageSpaceDetails
+from web.models import PictureFrameImage
 from web.sql import create_db_and_tables, get_all, get_session
 from dotenv import load_dotenv
 from sqlmodel import Session
-import os
-
 import traceback
-
 from web.utils import (
     check_if_file_exists,
     delete_image,
@@ -24,8 +31,9 @@ from web.utils import (
     format_datetime,
     get_remaining_storage_space,
 )
-
+from web.models import LoginBody
 from web.constants import IMAGE_FOLDER_LOCATION, ALLOWED_EXTENSIONS
+from web.auth import validate_token, check_credentials, issue_token, revoke_token
 
 from .logger import logger
 
@@ -42,7 +50,6 @@ app = FastAPI(lifespan=lifespan)
 IMAGE_FOLDER_LOCATION.mkdir(parents=True, exist_ok=True)
 
 app.mount("/images", StaticFiles(directory="src/static/images"), name="images")
-
 app.mount("/css", StaticFiles(directory="src/static/css"), name="css")
 app.mount("/webfonts", StaticFiles(directory="src/static/webfonts"), name="webfonts")
 app.mount("/js", StaticFiles(directory="src/static/js"), name="js")
@@ -53,15 +60,40 @@ load_dotenv()
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    PUBLIC_PATHS = ["/login", "/logout", "/"]
+    PUBLIC_PREFIXES = ["/css/", "/js/", "/webfonts/", "/images/"]
+    path = request.url.path
+    if path in PUBLIC_PATHS or any(path.startswith(p) for p in PUBLIC_PREFIXES):
+        return await call_next(request)
+
+    try:
+        validate_token(request)
+
+    except HTTPException as err:
+        return JSONResponse({"detail": "Authorisation Error"}, status_code=401)
+
+    except Exception as err:
+        return JSONResponse({"detail": "Internal Server Error"}, status_code=500)
+
+    return await call_next(request)
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def get_login(request: Request):
+    return templates.TemplateResponse(request=request, name="login.html")
+
+
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request, session: SessionDep, search: str | None = None):
-    image_list: List[PictureFrameImage] = get_image_list(session, search)
+    # image_list: List[PictureFrameImage] = get_image_list(session, search)
     storage = get_remaining_storage_space()
     return templates.TemplateResponse(
         request=request,
         name="home.html",
         context={
-            "image_list": image_list,
+            "image_list": [],
             "storage": storage,
             "allowed_extensions": ALLOWED_EXTENSIONS,
         },
@@ -117,6 +149,29 @@ async def get_list(session: SessionDep):
 
     except Exception as err:
         handle_error(err, f"Error getting list of images with error: {err}")
+
+
+@app.post("/login")
+def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
+    try:
+        if not check_credentials(username=username, password=password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect login details",
+            )
+        return {"token": issue_token()}
+
+    except Exception as err:
+        handle_error(err, f"Error getting authorisation token: {err}")
+
+
+@app.post("/logout")
+def logout(request: Request):
+    try:
+        revoke_token(request)
+
+    except Exception as err:
+        handle_error(err, f"Error logging out: {err}")
 
 
 @app.post("/image/delete/")

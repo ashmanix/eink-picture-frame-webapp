@@ -13,3 +13,8 @@ ALLOWED_EXTENSIONS = ", ".join(IMAGE_FILE_TYPES)
 ext_pattern = "|".join(ext.lstrip(".") for ext in IMAGE_FILE_TYPES)
 
 FILENAME_VALIDATION_REGEX = rf"^.*\.({ext_pattern})$"
+
+# Auth
+TOKEN_TTL_SECS = 1800
+ADMIN_USER = os.getenv("ADMIN_USER", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")

@@ -1,3 +1,5 @@
+import { TOKEN_KEY } from "../constants.js";
+
 export const updateList = async (search = null) => {
   const url = new URL(globalThis.location.href + `image_list/partial`);
   if (search) {
@@ -68,6 +70,37 @@ export const uploadImage = async (file) => {
   return callAPI(url, options, "uploading image");
 };
 
+export const login = async (username, password) => {
+  const form = new FormData();
+  form.append("username", username);
+  form.append("password", password);
+
+  const url = "/login";
+  const options = {
+    method: "POST",
+    body: form,
+  };
+  const result = await callAPI(url, options);
+
+  if (result?.error || !result?.token) return result;
+
+  sessionStorage.setItem(TOKEN_KEY, result.token);
+  globalThis.location.replace("/");
+};
+
+export const logout = async () => {
+  const url = "/logout";
+  const options = {
+    method: "POST",
+  };
+  const result = await callAPI(url, options);
+
+  if (result?.error) return result;
+
+  sessionStorage.removeItem(TOKEN_KEY);
+  globalThis.location.replace("/login");
+};
+
 const callAPI = async (
   url,
   options = {},
@@ -76,7 +109,15 @@ const callAPI = async (
 ) => {
   let responseBody = {};
   try {
-    const response = await fetch(url, options);
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    const headers = { ...(options.headers || {}), "X-Session": token ?? "" };
+    const response = await fetch(url, { ...options, headers });
+
+    if (response.status === 401) {
+      sessionStorage.removeItem(TOKEN_KEY);
+      globalThis.location.replace("/login");
+      throw new Error(`Login required`);
+    }
 
     if (!response.ok) {
       responseBody = await response.json();
