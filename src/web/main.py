@@ -24,7 +24,7 @@ from web.utils import (
     get_remaining_storage_space,
 )
 
-from web.constants import IMAGE_FOLDER_LOCATION
+from web.constants import IMAGE_FOLDER_LOCATION, ALLOWED_EXTENSIONS
 
 from .logger import logger
 
@@ -59,7 +59,11 @@ async def root(request: Request, session: SessionDep, search: str | None = None)
     return templates.TemplateResponse(
         request=request,
         name="home.html",
-        context={"image_list": image_list, "storage": storage},
+        context={
+            "image_list": image_list,
+            "storage": storage,
+            "allowed_extensions": ALLOWED_EXTENSIONS,
+        },
     )
 
 
@@ -85,7 +89,10 @@ async def get_list_partial(
         return templates.TemplateResponse(
             request=request,
             name="partial/image_list.html",
-            context={"image_list": image_list},
+            context={
+                "image_list": image_list,
+                "allowed_extensions": ALLOWED_EXTENSIONS,
+            },
         )
     except Exception as err:
         handle_error(err, f"Error getting partial list: {err}")
