@@ -83,8 +83,8 @@ export const uploadImage = async (file) => {
     });
 
     if (!response.ok) throw new Error("Error uploading image!");
-    const result = await response.json();
-    await updateAllDetails();
+    await response.json();
+
     return true;
   } catch (error) {
     console.error("Upload failed:", error);

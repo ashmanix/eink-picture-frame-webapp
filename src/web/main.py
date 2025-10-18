@@ -8,6 +8,7 @@ from web.models import PictureFrameImage, StorageSpaceDetails
 from web.sql import create_db_and_tables, get_all, get_session
 from dotenv import load_dotenv
 from sqlmodel import Session
+import os
 
 import traceback
 

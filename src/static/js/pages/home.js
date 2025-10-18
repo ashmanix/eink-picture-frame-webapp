@@ -6,11 +6,25 @@ import {
   updateAllDetails,
 } from "../components/image-utils.js";
 
+import {
+  openModal,
+  getModalTarget,
+  closeAllModals,
+  attachModelCloseEvents,
+} from "../components/modal.js";
+
 import { setNotification } from "../pages/base.js";
+
+import { THUMBNAIL_FOLDER_LOCATION } from "../constants.js";
 
 const refreshButton = document.getElementById("refresh-list-button");
 const searchButton = document.getElementById("search-button");
 const searchInput = document.getElementById("search-input");
+
+const refreshPage = async () => {
+  await updateAllDetails();
+  attachModelCloseEvents();
+};
 
 const runImageSearch = async (value = null, clearList = null) => {
   searchButton.classList.toggle("is-loading");
@@ -26,6 +40,7 @@ const runImageSearch = async (value = null, clearList = null) => {
       }
     } else await updateList();
   }
+  attachModelCloseEvents();
 
   searchButton.classList.toggle("is-loading");
 };
@@ -57,6 +72,8 @@ refreshButton.addEventListener("click", async () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+  attachModelCloseEvents();
+
   const container = document.querySelector("#image-list-container");
   container.addEventListener("click", async (event) => {
     const setButton = event.target.closest(".set-image-button");
@@ -67,9 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await setImage(id);
       toggleEnableImageButtons(id, true);
       if (result?.error) {
-        setNotification(`Error setting image: ${filename}`, "is-danger");
+        setNotification(
+          `Error attempting to set ${filename} as frame image`,
+          "is-danger"
+        );
       } else {
-        setNotification(`Image: ${filename} set successfully!`, "is-success");
+        setNotification(`${filename} set as frame image`, "is-success");
       }
     }
 
@@ -80,14 +100,24 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleEnableImageButtons(id, false);
       const result = await deleteImage(id);
       if (result.error) {
-        setNotification(`Error deleting image: ${filename}`, "is-danger");
+        setNotification(`Error attempting to delete ${filename}`, "is-danger");
       } else {
-        setNotification(
-          `Image: ${filename} deleted successfully!`,
-          "is-success"
-        );
+        setNotification(`${filename} deleted successfully`, "is-success");
       }
-      await updateAllDetails();
+      await refreshPage();
+    }
+
+    const imageButton = event.target.closest(".thumb-container");
+
+    if (imageButton) {
+      const modelTarget = getModalTarget();
+      const imageSource = document.querySelector(".image-img");
+      if (imageSource) {
+        const filename = imageButton.dataset.filename;
+        imageSource.src = `${THUMBNAIL_FOLDER_LOCATION}/${filename}`;
+        closeAllModals();
+        openModal(modelTarget);
+      }
     }
   });
 
@@ -142,13 +172,14 @@ uploadButton.addEventListener("click", async () => {
     uploadButton.classList.toggle("is-loading");
     return;
   }
-
+  closeAllModals();
   const result = await uploadImage(file);
+  refreshPage();
 
   if (result?.error) {
-    setNotification(`Error uploading image: ${filename}`, "is-danger");
+    setNotification(`Error attempting to upload ${filename}`, "is-danger");
   } else {
-    setNotification(`Image: ${filename} uploaded successfully!`, "is-success");
+    setNotification(`${filename} uploaded successfully`, "is-success");
   }
   fileInput.value = "";
   fileName.textContent = "No Image Selected";

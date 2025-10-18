@@ -7,8 +7,8 @@
         {% for image in image_list %}
         <article class="media image-list-items is-disabled">
             <figure class="media-left">
-                <p class="image thumb-container is-128x128">
-                    <img src="/images/thumbnails/{{image.filename}}" alt="{{image.filename}}">
+                <p class="image thumb-container is-128x128" data-filename="{{ image.filename }}">
+                    <img src="/images/thumbnails/{{ image.filename }}" alt="{{ image.filename }}">
                 </p>
             </figure>
             <div class="media-content">
@@ -39,5 +39,14 @@
         </article>
         <hr />
         {% endfor %}
+    </div>
+    <div id="image-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="modal-image">
+                <img class="image-img" src="" alt=" Modal image">
+            </div>
+        </div>
+        <button id="image-model-close-button" class="modal-close is-large" aria-label="close"></button>
     </div>
 </div>
