@@ -12,25 +12,26 @@ export const setNotificationVisibility = (enable, type = "is-info") => {
     "notification-container"
   );
   if (notificationContainer) {
-    notificationContainer.classList.remove(
-      "is-info",
-      "is-warning",
-      "is-danger",
-      "is-success",
-      "is-primary"
-    );
-    notificationContainer.classList.add(type);
-
-    enable
-      ? notificationContainer.classList.remove("is-hidden")
-      : notificationContainer.classList.add("is-hidden");
+    if (enable === true) {
+      notificationContainer.classList.remove(
+        "is-info",
+        "is-warning",
+        "is-danger",
+        "is-success",
+        "is-primary"
+      );
+      notificationContainer.classList.add(type);
+      notificationContainer.classList.add("is-active");
+    } else {
+      notificationContainer.classList.remove("is-active");
+    }
   }
 };
 
 export const setNotification = (msg, type = "is-info") => {
   const notificationMessage = document.getElementById("notification-message");
   if (notificationMessage) {
-    notificationMessage.innerText = msg;
+    notificationMessage.innerHTML = msg;
     setNotificationVisibility(true, type);
   }
 };

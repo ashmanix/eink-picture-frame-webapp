@@ -1,10 +1,12 @@
 <div>
     {% if not image_list %}
-    <h5 class="title is-5">No images found</h5>
+    <div class="notification">
+        <h5 class="title is-5 has-text-centered">No images found</h5>
+    </div>
     {% endif %}
     <div id="image-list">
-        <hr />
         {% for image in image_list %}
+        <hr />
         <article class="media image-list-items is-disabled">
             <figure class="media-left">
                 <p class="image thumb-container is-128x128" data-filename="{{ image.filename }}">
@@ -21,17 +23,18 @@
             <nav class="level is-mobile">
                 <div class="level-left">
                     <div class="level-item">
-                        <button class="button delete-image-button" title="Delete image from device"
-                            data-id="{{ image.id }}" data-filename="{{ image.filename }}">
+                        <button class="button delete-image-button is-danger is-outlined"
+                            title="Delete image from device" data-id="{{ image.id }}"
+                            data-filename="{{ image.filename }}">
                             <span class="icon is-small has-text-danger">
                                 <i class="fas fa-xmark"></i>
                             </span>
                         </button>
                     </div>
-                    <button class="level-item button set-image-button" title="Set as current image"
-                        data-id="{{ image.id }}" data-filename="{{ image.filename }}">
+                    <button class="level-item button set-image-button is-success is-outlined"
+                        title="Set as current image" data-id="{{ image.id }}" data-filename="{{ image.filename }}">
                         <span class="icon is-small has-text-success">
-                            <i class="fas fa-check"></i>
+                            <i class="fas fa-arrow-right"></i>
                         </span>
                     </button>
                 </div>

@@ -36,7 +36,10 @@ const runImageSearch = async (value = null, clearList = null) => {
     if (searchValue) {
       const result = await updateList(searchValue);
       if (result?.error) {
-        setNotification("Error searching image list!", "is-danger");
+        setNotification(
+          createErrorMessage("Error searching image list", result),
+          "is-danger"
+        );
       }
     } else await updateList();
   }
@@ -85,7 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleEnableImageButtons(id, true);
       if (result?.error) {
         setNotification(
-          `Error attempting to set ${filename} as frame image`,
+          createErrorMessage(
+            `Error attempting to set ${filename} as frame image`,
+            result
+          ),
           "is-danger"
         );
       } else {
@@ -100,7 +106,10 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleEnableImageButtons(id, false);
       const result = await deleteImage(id);
       if (result.error) {
-        setNotification(`Error attempting to delete ${filename}`, "is-danger");
+        setNotification(
+          createErrorMessage(`Error attempting to delete ${filename}`, result),
+          "is-danger"
+        );
       } else {
         setNotification(`${filename} deleted successfully`, "is-success");
       }
@@ -168,17 +177,23 @@ uploadButton.addEventListener("click", async () => {
   const file = fileInput.files[0];
   const filename = file?.name;
   if (!file) {
-    setNotification(`Select a file first.`, "is-warning");
+    setNotification(`Select an image for upload`, "is-warning");
     uploadButton.classList.toggle("is-loading");
     return;
   }
   closeAllModals();
   const result = await uploadImage(file);
-  refreshPage();
 
   if (result?.error) {
-    setNotification(`Error attempting to upload ${filename}`, "is-danger");
+    setNotification(
+      createErrorMessage(
+        `Error attempting to upload <strong>${filename}</strong>`,
+        result
+      ),
+      "is-danger"
+    );
   } else {
+    refreshPage();
     setNotification(`${filename} uploaded successfully`, "is-success");
   }
   fileInput.value = "";
@@ -186,3 +201,9 @@ uploadButton.addEventListener("click", async () => {
   uploadButton.disabled = true;
   uploadButton.classList.toggle("is-loading");
 });
+
+const createErrorMessage = (msg, result) => {
+  return `${msg} ${
+    result?.detail ? `<br/><strong>Reason:</strong> ${result.detail}` : ""
+  }`;
+};

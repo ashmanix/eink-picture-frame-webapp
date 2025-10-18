@@ -1,36 +1,32 @@
 export const updateList = async (search = null) => {
-  try {
-    const url = new URL(globalThis.location.href + `image_list/partial`);
-    if (search) {
-      url.searchParams.set("search", search);
-    }
-    const response = await fetch(url.toString());
-
-    if (!response.ok) throw new Error(`Error getting image list partial`);
-    const html = await response.text();
-
-    document.getElementById("image-list-container").innerHTML = html;
-    return true;
-  } catch (error) {
-    console.error("Image partial retrieval failed:", error);
-    return { error: error };
+  const url = new URL(globalThis.location.href + `image_list/partial`);
+  if (search) {
+    url.searchParams.set("search", search);
   }
+
+  const response = await callAPI(url, {}, "getting image list partial", "html");
+  if (response?.error) {
+    return response;
+  }
+
+  const html = response;
+
+  document.getElementById("image-list-container").innerHTML = html;
+  return true;
 };
 
 export const updateStorageDetails = async () => {
-  try {
-    const url = new URL(globalThis.location.href + `storage/partial`);
-    const response = await fetch(url.toString());
+  const url = new URL(globalThis.location.href + `storage/partial`);
+  const response = await callAPI(url, {}, "getting storage partial", "html");
 
-    if (!response.ok) throw new Error(`Error getting storage partial`);
-    const html = await response.text();
-
-    document.getElementById("storage-details-container").innerHTML = html;
-    return true;
-  } catch (error) {
-    console.error("Storafe partial retrieval failed:", error);
-    return { error: error };
+  if (response?.error) {
+    return response;
   }
+
+  const html = response;
+
+  document.getElementById("storage-details-container").innerHTML = html;
+  return true;
 };
 
 export const updateAllDetails = async () => {
@@ -39,55 +35,59 @@ export const updateAllDetails = async () => {
 };
 
 export const deleteImage = async (id) => {
-  try {
-    const url = `/image/delete/${id}`;
-    const response = await fetch(url, {
-      method: "POST",
-    });
+  const url = `/image/delete/${id}`;
+  const options = {
+    method: "POST",
+  };
 
-    if (!response.ok) throw new Error(`Error deleting image ID: ${id}`);
-    const data = await response.json();
-    console.log("Deleted:", data);
-    return true;
-  } catch (error) {
-    console.error("Deletion failed:", error);
-    return { error: error };
-  } finally {
-    updateAllDetails();
+  const result = await callAPI(url, options);
+
+  if (result?.error) {
+    return result;
   }
+  updateAllDetails();
 };
 
 export const setImage = async (id) => {
   const url = "/image/display/" + id;
-  try {
-    const response = await fetch(url, { method: "POST" });
-    if (!response.ok) {
-      throw new Error(`Error trying to set image to image ID: ${id}`);
-    }
-    return true;
-  } catch (error) {
-    console.error(error);
-    return { error: error };
-  }
+  const options = { method: "POST" };
+
+  return callAPI(url, options);
 };
 
 export const uploadImage = async (file) => {
   const form = new FormData();
   form.append("file", file);
 
+  const url = "/image/upload";
+  const options = {
+    method: "POST",
+    body: form,
+  };
+
+  return callAPI(url, options, "uploading image");
+};
+
+const callAPI = async (
+  url,
+  options = {},
+  callType = "calling api",
+  returnType = ""
+) => {
+  let responseBody = {};
   try {
-    const url = "/image/upload";
-    const response = await fetch(url, {
-      method: "POST",
-      body: form,
-    });
+    const response = await fetch(url, options);
 
-    if (!response.ok) throw new Error("Error uploading image!");
-    await response.json();
-
-    return true;
+    if (!response.ok) {
+      responseBody = await response.json();
+      throw new Error(`Error ${callType}`);
+    }
+    if (returnType === "html") {
+      return await response.text();
+    }
+    return await response.json();
   } catch (error) {
-    console.error("Upload failed:", error);
-    return { error: error };
+    console.error(error);
+    return { error: error, detail: responseBody?.detail };
   }
 };
