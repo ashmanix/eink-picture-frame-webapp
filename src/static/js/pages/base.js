@@ -26,6 +26,7 @@ let hideTimer = null;
 const TIMEOUT_DURATION = 5000;
 
 export const setNotificationVisibility = (enable, type = "is-info") => {
+  const notificationSection = document.querySelector(".notification-section");
   const notificationContainer = document.getElementById(
     "notification-container"
   );
@@ -43,13 +44,14 @@ export const setNotificationVisibility = (enable, type = "is-info") => {
         "is-success",
         "is-primary"
       );
-      notificationContainer.classList.add(type, "is-active");
+      notificationContainer.classList.add(type);
+      notificationSection.classList.add("is-active");
       hideTimer = setTimeout(() => {
-        notificationContainer.classList.remove("is-active");
+        notificationSection.classList.remove("is-active");
         hideTimer = null;
       }, TIMEOUT_DURATION);
     } else {
-      notificationContainer.classList.remove("is-active");
+      notificationSection.classList.remove("is-active");
     }
   }
 };

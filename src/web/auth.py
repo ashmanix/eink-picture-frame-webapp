@@ -32,9 +32,7 @@ def revoke_token(token: str):
 def validate_token(request: Request):
     token = request.headers.get("X-Session", "")
     exp = TOKENS.get(token)
-    print(f"EXP: ${exp}")
     if not exp or exp < _now():
-        print("HWEY")
         TOKENS.pop(token, None)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"

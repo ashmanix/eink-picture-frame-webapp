@@ -14,13 +14,6 @@ body {
     flex: 1;
 }
 
-.notification-section {
-    padding: 4rem 1rem 1rem 1rem;
-    position: absolute;
-    z-index: 10;
-    width: 100%;
-}
-
 .main-footer {
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -52,11 +45,34 @@ body {
     justify-content: center;
 }
 
-#notification-container {
+.notification-section {
+    position: fixed;
+    bottom: 10px;
+    z-index: 35;
+    width: 100%;
+
+    visibility: hidden;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition:
+        opacity .2s ease,
+        transform .2s ease,
+        visibility 0s .2s;
 }
 
-#notification-container.is-active {
+.notification-section.is-active {
     opacity: 1;
+    visibility: visible;
+    transition:
+        opacity .2s ease,
+        transform .2s ease,
+        visibility 0s;
+}
+
+
+#notification-container {
+    margin: 2rem 2rem;
+}
+
+#app-modal {
+    z-index: 31;
 }

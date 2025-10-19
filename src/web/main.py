@@ -62,8 +62,8 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
-    PUBLIC_PATHS = ["/login", "/logout", "/"]
-    PUBLIC_PREFIXES = ["/css/", "/js/", "/webfonts/", "/images/"]
+    PUBLIC_PATHS = ["/login", "/logout", "/", "/docs"]
+    PUBLIC_PREFIXES = ["/css/", "/js/", "/webfonts/", "/images/", "/openapi"]
     path = request.url.path
     if path in PUBLIC_PATHS or any(path.startswith(p) for p in PUBLIC_PREFIXES):
         return await call_next(request)
@@ -80,14 +80,13 @@ async def auth_middleware(request: Request, call_next):
     return await call_next(request)
 
 
-@app.get("/login", response_class=HTMLResponse)
-async def get_login(request: Request):
+@app.get("/login", response_class=HTMLResponse, description="Get login page template")
+async def get_login_page(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, description="Get home page")
 async def root(request: Request, session: SessionDep, search: str | None = None):
-    # image_list: List[PictureFrameImage] = get_image_list(session, search)
     storage = get_remaining_storage_space()
     return templates.TemplateResponse(
         request=request,
@@ -100,7 +99,7 @@ async def root(request: Request, session: SessionDep, search: str | None = None)
     )
 
 
-@app.get("/storage/partial")
+@app.get("/storage/partial", description="Get storage partial template")
 async def get_storage_partial(request: Request):
     try:
         storage = get_remaining_storage_space()
@@ -113,7 +112,7 @@ async def get_storage_partial(request: Request):
         handle_error(err, f"Error getting partial list: {err}")
 
 
-@app.get("/image_list/partial")
+@app.get("/image_list/partial", description="Get image list partial")
 async def get_list_partial(
     request: Request, session: SessionDep, search: str | None = None
 ):
@@ -131,7 +130,7 @@ async def get_list_partial(
         handle_error(err, f"Error getting partial list: {err}")
 
 
-@app.get("/storage_space")
+@app.get("/storage_space", description="Get storage space details")
 async def get_storage_space():
     try:
         storage = get_remaining_storage_space()
@@ -141,8 +140,8 @@ async def get_storage_space():
         handle_error(err, f"Error getting partial list: {err}")
 
 
-@app.get("/image_list")
-async def get_list(session: SessionDep):
+@app.get("/image_list", description="Get list of images stored on device")
+async def get_list_of_images(session: SessionDep):
     try:
         results = get_all(session)
         return {"image_list": results}
@@ -151,7 +150,7 @@ async def get_list(session: SessionDep):
         handle_error(err, f"Error getting list of images with error: {err}")
 
 
-@app.post("/login")
+@app.post("/login", description="Login to app with login details")
 def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
     try:
         if not check_credentials(username=username, password=password):
@@ -165,7 +164,7 @@ def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
         handle_error(err, f"Error getting authorisation token: {err}")
 
 
-@app.post("/logout")
+@app.post("/logout", description="Logout of app")
 def logout(request: Request):
     try:
         revoke_token(request)
@@ -174,8 +173,8 @@ def logout(request: Request):
         handle_error(err, f"Error logging out: {err}")
 
 
-@app.post("/image/delete/")
-async def delete_list(files: list[int], session: SessionDep):
+@app.post("/image/delete/", description="Delete multiple images from device")
+async def delete_list_of_images(files: list[int], session: SessionDep):
     try:
         results = delete_image_list(files, session)
         return results
@@ -184,8 +183,8 @@ async def delete_list(files: list[int], session: SessionDep):
         handle_error(err, f"Error deleting list of images with error: {err}")
 
 
-@app.post("/image/delete/{id}")
-async def delete(
+@app.post("/image/delete/{id}", description="Delete an image from device")
+async def delete_image(
     id: int,
     session: SessionDep,
 ):
@@ -199,7 +198,7 @@ async def delete(
         handle_error(err, f"Error deleting image with error: {err}")
 
 
-@app.post("/image/upload")
+@app.post("/image/upload", description="Upload an image to device")
 async def upload_image(session: SessionDep, file: UploadFile = File(...)):
     try:
         filename = file.filename
@@ -214,7 +213,9 @@ async def upload_image(session: SessionDep, file: UploadFile = File(...)):
         handle_error(err, f"Error uploading image with error: {err}")
 
 
-@app.post("/image/display/{id}")
+@app.post(
+    "/image/display/{id}", description="Set an image as image displayed on screen"
+)
 async def set_current(
     id: int,
     session: SessionDep,

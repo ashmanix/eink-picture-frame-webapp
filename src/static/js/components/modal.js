@@ -1,13 +1,21 @@
+const modalContent = document.querySelector(".modal-content");
+
 export const getModalTarget = () => {
-  return document.getElementById("image-modal");
+  return document.getElementById("app-modal");
 };
 
-export const openModal = ($el) => {
-  $el.classList.add("is-active");
+export const openModal = (el, insertElement = null) => {
+  if (modalContent && insertElement) {
+    modalContent.appendChild(insertElement);
+  }
+  el.classList.add("is-active");
 };
 
-export const closeModal = ($el) => {
-  $el.classList.remove("is-active");
+export const closeModal = (el) => {
+  el.classList.remove("is-active");
+  if (modalContent) {
+    modalContent.innerHTML = "";
+  }
 };
 
 export const closeAllModals = () => {
@@ -21,10 +29,10 @@ export const attachModelCloseEvents = () => {
     document.querySelectorAll(
       ".modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button"
     ) || []
-  ).forEach(($close) => {
-    const $target = $close.closest(".modal");
+  ).forEach((close) => {
+    const $target = close.closest(".modal");
 
-    $close.addEventListener("click", () => {
+    close.addEventListener("click", () => {
       closeModal($target);
     });
   });

@@ -1,163 +1,57 @@
 import {
-  updateList,
-  deleteImage,
-  setImage,
+  // updateList,
+  // deleteImage,
+  // setImage,
   uploadImage,
   updateAllDetails,
 } from "../utils/api.js";
-
 import {
-  openModal,
+  // openModal,
   getModalTarget,
   closeAllModals,
   attachModelCloseEvents,
+  openModal,
 } from "../components/modal.js";
-
 import { createErrorMessage } from "../utils/messages.js";
-
 import { setNotification } from "../pages/base.js";
+import { imageListSetup, runImageSearch } from "../components/image-list.js";
+import { bus } from "../utils/bus.js";
 
-import { THUMBNAIL_FOLDER_LOCATION } from "../constants.js";
+const handleImageEvents = async (event) => {
+  switch (event.type) {
+    case "image-deleted":
+      console.log("Image deleted!: ", event);
+      attachModelCloseEvents();
+      break;
+    case "image-clicked":
+      console.log("Image clicked!: ", event);
+      closeAllModals();
+      openModal(getModalTarget(), event.detail.modalContent);
+      break;
+    case "image-delete-selected":
+      console.log(event);
+      break;
+  }
+  if (event.detail.message)
+    setNotification(event.detail.message, event.detail.type);
+};
 
-const refreshButton = document.getElementById("refresh-list-button");
-const searchButton = document.getElementById("search-button");
-const searchInput = document.getElementById("search-input");
+bus.addEventListener("image-deleted", handleImageEvents);
+bus.addEventListener("image-delete-selected", handleImageEvents);
+bus.addEventListener("image-uploaded", handleImageEvents);
+bus.addEventListener("image-set", handleImageEvents);
+bus.addEventListener("image-clicked", handleImageEvents);
+bus.addEventListener("image-search", handleImageEvents);
 
 const refreshPage = async () => {
   await updateAllDetails();
   attachModelCloseEvents();
 };
 
-const runImageSearch = async (value = null, clearList = null) => {
-  searchButton.classList.toggle("is-loading");
-
-  if (clearList) {
-    await updateList();
-  } else {
-    const searchValue = value ?? searchInput.value;
-    if (searchValue) {
-      const result = await updateList(searchValue);
-      if (result?.error) {
-        setNotification(
-          createErrorMessage("Error searching image list", result),
-          "is-danger"
-        );
-      }
-    } else await updateList();
-  }
-  attachModelCloseEvents();
-
-  searchButton.classList.toggle("is-loading");
-};
-
-const toggleEnableImageButtons = (id, enable) => {
-  const deleteButton = document.querySelector(
-    `.delete-image-button[data-id="${id}"]`
-  );
-
-  const setButton = document.querySelector(
-    `.set-image-button[data-id="${id}"]`
-  );
-
-  const progressBar = document.querySelector(`.progress[data-id="${id}"]`);
-
-  enable
-    ? progressBar.classList.add("is-invisible")
-    : progressBar.classList.remove("is-invisible");
-
-  for (const btn of [deleteButton, setButton]) {
-    if (btn) btn.disabled = !enable;
-  }
-};
-
-refreshButton.addEventListener("click", async () => {
-  refreshButton.classList.toggle("is-loading");
-  await runImageSearch();
-  refreshButton.classList.toggle("is-loading");
-});
-
 document.addEventListener("DOMContentLoaded", async () => {
   attachModelCloseEvents();
-
+  await imageListSetup();
   await runImageSearch();
-
-  const container = document.querySelector("#image-list-container");
-  container.addEventListener("click", async (event) => {
-    const setButton = event.target.closest(".set-image-button");
-    if (setButton) {
-      const id = setButton.dataset.id;
-      const filename = setButton.dataset.filename;
-      toggleEnableImageButtons(id, false);
-      const result = await setImage(id);
-      toggleEnableImageButtons(id, true);
-      if (result?.error) {
-        setNotification(
-          createErrorMessage(
-            `Error attempting to set ${filename} as frame image`,
-            result
-          ),
-          "is-danger"
-        );
-      } else {
-        setNotification(`${filename} set as frame image`, "is-success");
-      }
-    }
-
-    const deleteButton = event.target.closest(".delete-image-button");
-    if (deleteButton) {
-      const id = deleteButton.dataset.id;
-      const filename = deleteButton.dataset.filename;
-      toggleEnableImageButtons(id, false);
-      const result = await deleteImage(id);
-      if (result.error) {
-        setNotification(
-          createErrorMessage(`Error attempting to delete ${filename}`, result),
-          "is-danger"
-        );
-      } else {
-        setNotification(`${filename} deleted successfully`, "is-success");
-      }
-      await refreshPage();
-    }
-
-    const imageButton = event.target.closest(".thumb-container");
-
-    if (imageButton) {
-      const modelTarget = getModalTarget();
-      const imageSource = document.querySelector(".image-img");
-      if (imageSource) {
-        const filename = imageButton.dataset.filename;
-        imageSource.src = `${THUMBNAIL_FOLDER_LOCATION}/${filename}`;
-        closeAllModals();
-        openModal(modelTarget);
-      }
-    }
-  });
-
-  searchButton.addEventListener("click", (event) => {
-    const searchValue = searchInput.value;
-
-    if (searchValue) {
-      runImageSearch(searchValue);
-    }
-  });
-
-  searchInput.addEventListener("input", (event) => {
-    const value = event.target.value;
-    if (value?.length > 2) {
-      searchButton.disabled = false;
-    } else if (value?.length == 0) {
-      runImageSearch(null, true);
-    } else {
-      searchButton.disabled = true;
-    }
-  });
-
-  searchInput.addEventListener("keyup", (event) => {
-    if (event.key === "Enter") {
-      if (searchButton.disabled === false) runImageSearch();
-    }
-  });
 });
 
 const uploadButton = document.getElementById("upload-button");

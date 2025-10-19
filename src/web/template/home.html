@@ -51,10 +51,10 @@
             <div class="level-item">
                 <div class="field has-addons is-expanded">
                     <p class="control is-expanded">
-                        <input id="search-input" class="input" type="text" placeholder="Search images" />
+                        <input id="search-input" class="input" type="text" placeholder="Search stored images" />
                     </p>
                     <p class="control">
-                        <button class="button" id="search-button" title="Search images">
+                        <button class="button" id="search-button" title="Search stored images">
                             <span class="icon is-small">
                                 <i class="fas fa-magnifying-glass"></i>
                             </span>
@@ -64,7 +64,13 @@
             </div>
         </div>
         <div class="level-right">
-            <div class="level-item">
+            <div class="buttons">
+                <button class="level-item button set-image-button is-danger is-outlined" id="delete-all-button"
+                    title="Delete all selected images" disabled>
+                    <span class="icon is-small has-text-danger">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                </button>
                 <button class="button" id="refresh-list-button" title="Refresh list">
                     <span class="icon is-small">
                         <i class="fas fa-rotate-right"></i>
@@ -75,11 +81,16 @@
     </div>
 
     <section id="list-of-cards">
-        <div class="loading" aria-busy="true"></div>
         <div id="image-list-container">
             {% include "partial/image_list.html" %}
         </div>
     </section>
+    <div id="app-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+        </div>
+        <button id="image-model-close-button" class="modal-close is-large" aria-label="close"></button>
+    </div>
 </div>
 
 {% endblock %}

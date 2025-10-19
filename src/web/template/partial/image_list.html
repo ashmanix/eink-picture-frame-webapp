@@ -21,7 +21,7 @@
                     max="100"></progress>
             </div>
             <nav class="level is-mobile">
-                <div class="level-left">
+                <div class="level-right">
                     <div class="level-item">
                         <button class="button delete-image-button is-danger is-outlined"
                             title="Delete image from device" data-id="{{ image.id }}"
@@ -31,25 +31,25 @@
                             </span>
                         </button>
                     </div>
-                    <button class="level-item button set-image-button is-success is-outlined"
-                        title="Set as current image" data-id="{{ image.id }}" data-filename="{{ image.filename }}">
-                        <span class="icon is-small has-text-success">
-                            <i class="fas fa-arrow-right"></i>
-                        </span>
-                    </button>
+                    <div class="level-item">
+                        <button class="button set-image-button is-success is-outlined" title="Set as current image"
+                            data-id="{{ image.id }}" data-filename="{{ image.filename }}">
+                            <span class="icon is-small has-text-success">
+                                <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </button>
+                    </div>
+                    <div class="level-item"></div>
+                    <div class="level-item">
+                        <label class="checkbox ml-3 mr-3" data-id="{{ image.id }}" data-filename="{{ image.filename }}">
+                            <input class="image-checkbox" data-id="{{ image.id }}" data-filename="{{ image.filename }}"
+                                type="checkbox" />
+                        </label>
+                    </div>
                 </div>
             </nav>
         </article>
         <hr />
         {% endfor %}
-    </div>
-    <div id="image-modal" class="modal">
-        <div class="modal-background"></div>
-        <div class="modal-content">
-            <div class="modal-image">
-                <img class="image-img" src="" alt=" Modal image">
-            </div>
-        </div>
-        <button id="image-model-close-button" class="modal-close is-large" aria-label="close"></button>
     </div>
 </div>
