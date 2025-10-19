@@ -57,7 +57,7 @@ def delete_thumbnail(image_file_name: str):
         )
 
 
-def delete_image(id: int, session: Session):
+def delete_image(id: int, session: Session) -> str:
     image: PictureFrameImage = get_item(id, session)
     filename = image.filename
     logger.info(f"Attempting to delete file: {filename} from folder.")
@@ -74,6 +74,7 @@ def delete_image(id: int, session: Session):
         delete_thumbnail(filename)
         delete_item(image.id, session)
         logger.info(f"File: {filename} was successfully removed!")
+        return filename
 
 
 def delete_image_list(
@@ -84,8 +85,8 @@ def delete_image_list(
 
     for id in image_id_list:
         try:
-            delete_image(id, session)
-            successful_list.append(id)
+            name = delete_image(id, session)
+            successful_list.append(name)
         except Exception as err:
             failed_list.append(FileError(filename=id, error_message=str(err)))
     return FileDeletionResults(successful=successful_list, failed=failed_list)

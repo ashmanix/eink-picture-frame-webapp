@@ -21,7 +21,7 @@ const handleImageEvents = async (event) => {
   switch (event.type) {
     case "image-deleted":
       console.log("Image deleted!: ", event);
-      attachModelCloseEvents();
+      closeAllModals();
       break;
     case "image-clicked":
       console.log("Image clicked!: ", event);
@@ -29,10 +29,15 @@ const handleImageEvents = async (event) => {
       openModal(getModalTarget(), event.detail.modalContent);
       break;
     case "image-delete-selected":
+      closeAllModals();
+      openModal(getModalTarget(), event.detail.modalContent);
       console.log(event);
       break;
+    case "close-modal":
+      closeAllModals();
+      break;
   }
-  if (event.detail.message)
+  if (event?.detail?.message)
     setNotification(event.detail.message, event.detail.type);
 };
 
@@ -42,6 +47,7 @@ bus.addEventListener("image-uploaded", handleImageEvents);
 bus.addEventListener("image-set", handleImageEvents);
 bus.addEventListener("image-clicked", handleImageEvents);
 bus.addEventListener("image-search", handleImageEvents);
+bus.addEventListener("close-modal", handleImageEvents);
 
 const refreshPage = async () => {
   await updateAllDetails();

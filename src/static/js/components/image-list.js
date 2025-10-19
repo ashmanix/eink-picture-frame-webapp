@@ -1,4 +1,9 @@
-import { updateList, deleteImage, setImage } from "../utils/api.js";
+import {
+  updateList,
+  deleteImage,
+  setImage,
+  deleteMultipleImage,
+} from "../utils/api.js";
 import { attachModelCloseEvents } from "./modal.js";
 import { createErrorMessage } from "../utils/messages.js";
 import { THUMBNAIL_FOLDER_LOCATION } from "../constants.js";
@@ -24,11 +29,7 @@ export const runImageSearch = async (value = null, clearList = null) => {
           "Error searching image list",
           result
         );
-        bus.dispatchEvent(
-          new CustomEvent("image-search", {
-            detail: { message: message, type: "is-danger" },
-          })
-        );
+        sendBusEvent("image-search", message, "is-danger");
       }
     } else await updateList();
   }
@@ -77,18 +78,10 @@ export const imageListSetup = async () => {
           `Error attempting to set ${filename} as frame image`,
           result
         );
-        bus.dispatchEvent(
-          new CustomEvent("image-set", {
-            detail: { message: message, type: "is-danger" },
-          })
-        );
+        sendBusEvent("image-set", message, "is-danger");
       } else {
         const message = `${filename} set as frame image`;
-        bus.dispatchEvent(
-          new CustomEvent("image-set", {
-            detail: { message: message, type: "is-success" },
-          })
-        );
+        sendBusEvent("image-set", message, "is-success");
       }
     }
 
@@ -103,18 +96,10 @@ export const imageListSetup = async () => {
           `Error attempting to delete ${filename}`,
           result
         );
-        bus.dispatchEvent(
-          new CustomEvent("image-deleted", {
-            detail: { message: message, type: "is-error" },
-          })
-        );
+        sendBusEvent("image-deleted", message, "is-error");
       } else {
         const message = `${filename} deleted successfully`;
-        bus.dispatchEvent(
-          new CustomEvent("image-deleted", {
-            detail: { message, type: "is-success" },
-          })
-        );
+        sendBusEvent("image-deleted", message, "is-success");
       }
     }
 
@@ -129,13 +114,7 @@ export const imageListSetup = async () => {
       imageElement.alt = filename;
       imageContainerElement.appendChild(imageElement);
 
-      bus.dispatchEvent(
-        new CustomEvent("image-clicked", {
-          detail: {
-            modalContent: imageContainerElement,
-          },
-        })
-      );
+      sendBusEvent("image-clicked", null, null, imageContainerElement);
     }
     const imageCheckBox = event.target.closest(".image-checkbox");
 
@@ -148,7 +127,6 @@ export const imageListSetup = async () => {
       } else if (imageCheckBox?.checked === false) {
         removeImageFromList(imageCheckBox?.dataset?.id);
       }
-      console.log("Image List: ", imagesSelected);
     }
   });
 
@@ -184,18 +162,10 @@ export const imageListSetup = async () => {
   });
 
   deleteAllButton.addEventListener("click", async () => {
-    console.log("Delete All");
-    // const modelTarget = getModalTarget();
-    // closeAllModals();
-    // openModal(modelTarget);
+    if (!imagesSelected.length) return;
 
-    bus.dispatchEvent(
-      new CustomEvent("image-delete-selected", {
-        detail: {
-          imagesSelected,
-        },
-      })
-    );
+    const modalContent = createDeleteCofirmation(imagesSelected);
+    sendBusEvent("image-delete-selected", null, null, modalContent);
   });
 };
 
@@ -213,4 +183,86 @@ const removeImageFromList = (id) => {
 
   if (!imagesSelected.length && deleteAllButton)
     deleteAllButton.disabled = true;
+};
+
+const createDeleteCofirmation = (imagesToDelete, onConfirm, onCancel) => {
+  const container = document.createElement("div");
+  container.classList.add("content");
+
+  const message = document.createElement("p");
+  message.textContent = "Do you wish to delete the following images?";
+  message.classList.add("title", "is-5", "mb-3");
+  container.appendChild(message);
+
+  const list = document.createElement("ul");
+  list.classList.add("mb-4");
+
+  for (const [index, image] of imagesToDelete.entries()) {
+    const li = document.createElement("li");
+    li.textContent = image.filename;
+    list.appendChild(li);
+  }
+
+  container.appendChild(list);
+
+  const buttons = document.createElement("div");
+  buttons.classList.add("buttons", "is-right");
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.textContent = "Confirm";
+  confirmBtn.classList.add("button", "is-danger");
+  confirmBtn.addEventListener("click", async () => {
+    const imageList = imagesToDelete.map((image) => {
+      return Number(image?.id);
+    });
+    const result = await deleteMultipleImage(imageList);
+    sendBusEvent("close-modal");
+    if (result?.error) {
+      const message = createErrorMessage(
+        `Error deleting multiple messages`,
+        result
+      );
+      sendBusEvent("image-deleted", message, "is-danger");
+    } else {
+      sendBusEvent(
+        "image-deleted",
+        "Images deleted successfully",
+        "is-success"
+      );
+    }
+  });
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.classList.add("button", "is-light");
+  cancelBtn.addEventListener("click", () => {
+    sendBusEvent("close-modal");
+  });
+
+  buttons.appendChild(confirmBtn);
+  buttons.appendChild(cancelBtn);
+  container.appendChild(buttons);
+
+  return container;
+};
+
+const sendBusEvent = (
+  eventName,
+  message = null,
+  messageType = null,
+  modalContent = null
+) => {
+  let detail = {};
+
+  if (modalContent) {
+    detail = {
+      modalContent,
+    };
+  } else if (message) {
+    detail = {
+      message: message,
+      type: messageType,
+    };
+  }
+  bus.dispatchEvent(new CustomEvent(eventName, { detail: detail }));
 };

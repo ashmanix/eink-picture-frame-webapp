@@ -50,6 +50,28 @@ export const deleteImage = async (id) => {
   updateAllDetails();
 };
 
+export const deleteMultipleImage = async (imageList) => {
+  const url = `/image/delete/`;
+  const options = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(imageList),
+  };
+
+  const result = await callAPI(url, options);
+
+  if (result?.error) {
+    return result;
+  }
+  if (result?.failed?.length) {
+    return {
+      error: "Error deleting all messages",
+      detail: `Some images failed to delete: ${result?.failed}`,
+    };
+  }
+  updateAllDetails();
+};
+
 export const setImage = async (id) => {
   const url = "/image/display/" + id;
   const options = { method: "POST" };

@@ -31,7 +31,6 @@ from web.utils import (
     format_datetime,
     get_remaining_storage_space,
 )
-from web.models import LoginBody
 from web.constants import IMAGE_FOLDER_LOCATION, ALLOWED_EXTENSIONS
 from web.auth import validate_token, check_credentials, issue_token, revoke_token
 
@@ -184,7 +183,7 @@ async def delete_list_of_images(files: list[int], session: SessionDep):
 
 
 @app.post("/image/delete/{id}", description="Delete an image from device")
-async def delete_image(
+async def delete_an_image(
     id: int,
     session: SessionDep,
 ):
