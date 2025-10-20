@@ -20,6 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
       await logout();
     });
   }
+
+  const menuBurger = document.querySelector(".navbar-burger");
+  if (menuBurger) {
+    const menu = document.getElementById(menuBurger?.dataset?.target);
+    menuBurger.addEventListener("click", () => {
+      menuBurger.classList.toggle("is-active");
+      menu.classList.toggle("is-active");
+    });
+  }
 });
 
 let hideTimer = null;

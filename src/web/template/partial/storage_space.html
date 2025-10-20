@@ -2,7 +2,7 @@
     <div class="level-item">
         <p>Storage Used: {{storage.used|round}}/{{storage.total|round}} GB</p>
     </div>
-    <progress class="progress {{storage.class_type}}" value="{{storage.percent}}" max="100">
+    <progress class="progress {{storage.class_type}} is-small is-hidden-mobile" value="{{storage.percent}}" max="100">
         {{storage.percent}}%
     </progress>
 </div>

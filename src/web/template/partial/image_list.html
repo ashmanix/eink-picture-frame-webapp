@@ -7,20 +7,43 @@
     <div id="image-list">
         {% for image in image_list %}
         <hr />
-        <article class="media image-list-items is-disabled">
+        <article class="media image-list-items is-hidden-mobiles">
             <figure class="media-left">
-                <p class="image thumb-container is-128x128" data-filename="{{ image.filename }}">
+                <p class="image thumb-container is-128x128 is-hidden-mobile" data-filename="{{ image.filename }}">
+                    <img src="/images/thumbnails/{{ image.filename }}" alt="{{ image.filename }}">
+                </p>
+                <p class="image thumb-container is-64x64 is-hidden-tablet" data-filename="{{ image.filename }}">
                     <img src="/images/thumbnails/{{ image.filename }}" alt="{{ image.filename }}">
                 </p>
             </figure>
             <div class="media-content">
-                <p class="is-title is-size-4">{{image.filename}}</p>
-                <p class="is-size-5">ID: {{image.id}}</p>
-                <p class="has-text-grey is-size-5">Uploaded: {{image.created_at|format_datetime}}</p>
-                <progress class="progress is-small is-primary mt-5 is-invisible" data-id="{{ image.id }}"
+                <p class="is-title is-size-4 image-filename is-hidden-mobile">{{image.filename}}</p>
+                <p class="is-title is-size-5 image-filename is-hidden-tablet">{{image.filename}}</p>
+                <p class="is-size-5 is-hidden-mobile">ID: {{image.id}}</p>
+                <p class="has-text-grey is-size-5 is-hidden-mobile">Uploaded: {{image.created_at|format_datetime}}</p>
+                <progress class="progress is-small is-primary mt-5 is-invisible" data-id="{{ image.id }}" value="0"
                     max="100"></progress>
             </div>
-            <nav class="level is-mobile">
+
+            <div class="buttons">
+                <button class="button delete-image-button is-danger is-outlined is-responsive"
+                    title="Delete image from device" data-id="{{ image.id }}" data-filename="{{ image.filename }}">
+                    <span class="icon is-small has-text-danger">
+                        <i class="fas fa-xmark"></i>
+                    </span>
+                </button>
+                <button class="button set-image-button is-success is-outlined is-responsive"
+                    title="Set as current image" data-id="{{ image.id }}" data-filename="{{ image.filename }}">
+                    <span class="icon is-small has-text-success">
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </button>
+                <label class="checkbox ml-3 mr-3" data-id="{{ image.id }}" data-filename="{{ image.filename }}">
+                    <input class="image-checkbox" data-id="{{ image.id }}" data-filename="{{ image.filename }}"
+                        type="checkbox" />
+                </label>
+            </div>
+            <!-- <nav class="level is-mobile">
                 <div class="level-right">
                     <div class="level-item">
                         <button class="button delete-image-button is-danger is-outlined"
@@ -47,9 +70,9 @@
                         </label>
                     </div>
                 </div>
-            </nav>
+            </nav> -->
         </article>
-        <hr />
         {% endfor %}
+        <hr />
     </div>
 </div>

@@ -41,7 +41,6 @@ export const deleteImage = async (id) => {
   const options = {
     method: "POST",
   };
-
   const result = await callAPI(url, options);
 
   if (result?.error) {

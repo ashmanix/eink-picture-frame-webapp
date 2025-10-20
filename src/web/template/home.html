@@ -5,95 +5,107 @@
 {% endblock %}
 {% block content %}
 <div>
-    <div class="mb-6">
+    <div class="mb-4">
         <h1 class="title">Images</h1>
         <h2 class="subtitle">
-            The list of images saved on the picture frame device
+            Images saved on device
         </h2>
     </div>
 
-    <div id="storage-details-container">
-        {% include "partial/storage_space.html" %}
-    </div>
-
-    <div class="level top-level top-bar">
-        <div class="level-left">
-        </div>
-
-        <div class="level-right notification">
-            <div class="level-item">
-                <p>Upload image to device</p>
-            </div>
-            <div class="level-item">
-                <div id="upload-image-input" class="file has-name is-fullwidth">
+    <div class="notification">
+        <div class="upload-image-container">
+            <div class="is-flex-direction-column ">
+                <span class="icon is-large is-hidden-mobile">
+                    <i class="fas fa-2x fa-upload"></i>
+                </span>
+                <p class="title is-size-4 is-hidden-mobile">Drag and Drop to Upload File</p>
+                <p class="title is-size-4 is-hidden-mobile">OR</p>
+                <div id="upload-image-input" class="file is-centered is-link">
                     <label class="file-label">
-                        <input id="image-file-upload-input" class="file-input" type="file" name="image-file"
-                            accept="{{ allowed_extensions }}" />
+                        <input class="file-input" type="file" name="image file upload" accept="{{ allowed_extensions }}"
+                            multiple />
                         <span class="file-cta">
-                            <span class="file-label"> Select image </span>
+                            <span class="file-label"> Browse Files </span>
                         </span>
-                        <span class="file-name"> No image selected </span>
                     </label>
                 </div>
             </div>
-            <div class="level-item">
-                <button class="button is-primary is-outlined" disabled id="upload-button" title="Upload image">
-                    <span class="icon is-small">
-                        <i class="fas fa-upload"></i>
-                    </span>
-                </button>
-            </div>
         </div>
-    </div>
+        <div class="buttons mt-4 is-justify-content-flex-end">
+            <button class="button is-responsive" disabled id="clear-image-selection-button"
+                title="Clear image selection">
+                <span class="icon is-small">
+                    <i class="fas fa-eraser"></i>
+                </span>
+                <span>Clear selection</span>
+            </button>
+            <button class="button is-link is-responsive" disabled id="upload-button" title="Upload image">
+                <span class="icon is-small">
+                    <i class="fas fa-upload"></i>
+                </span>
+                <span>Upload</span>
+            </button>
+        </div>
 
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <div class="field has-addons is-expanded">
-                    <p class="control is-expanded">
-                        <input id="search-input" class="input" type="text" placeholder="Search stored images" />
-                    </p>
-                    <p class="control">
-                        <button class="button" id="search-button" title="Search stored images">
-                            <span class="icon is-small">
-                                <i class="fas fa-magnifying-glass"></i>
-                            </span>
-                        </button>
-                    </p>
+        <div id="storage-details-container" class="mb-4">
+            {% include "partial/storage_space.html" %}
+        </div>
+
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <div class="field has-addons is-expanded">
+                        <p class="control is-expanded">
+                            <input id="search-input" class="input is-responsive" type="text"
+                                placeholder="Search images" />
+                        </p>
+                        <p class="control">
+                            <button class="button" id="search-button" title="Search images">
+                                <span class="icon is-small">
+                                    <i class="fas fa-magnifying-glass"></i>
+                                </span>
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="level-right">
+                <div class="buttons">
+                    <button class="level-item button set-image-button is-danger is-outlined is-responsive"
+                        id="delete-all-button" title="Delete all selected images" disabled>
+                        <span class="icon is-small has-text-danger">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                    </button>
+                    <button class="button is-responsive" id="select-all-toggle-button"
+                        title="Toggle selecting all images">
+                        <span class="icon is-small">
+                            <i class="fas fa-check-double"></i>
+                        </span>
+                    </button>
+                    <button class="button is-responsive" id="refresh-list-button" title="Refresh list">
+                        <span class="icon is-small">
+                            <i class="fas fa-rotate-right"></i>
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="level-right">
-            <div class="buttons">
-                <button class="level-item button set-image-button is-danger is-outlined" id="delete-all-button"
-                    title="Delete all selected images" disabled>
-                    <span class="icon is-small has-text-danger">
-                        <i class="fas fa-trash"></i>
-                    </span>
-                </button>
-                <button class="button" id="refresh-list-button" title="Refresh list">
-                    <span class="icon is-small">
-                        <i class="fas fa-rotate-right"></i>
-                    </span>
-                </button>
+
+        <section id="list-of-cards">
+            <div id="image-list-container">
+                {% include "partial/image_list.html" %}
             </div>
+        </section>
+        <div id="app-modal" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+            </div>
+            <button id="image-model-close-button" class="modal-close is-large" aria-label="close"></button>
         </div>
     </div>
 
-    <section id="list-of-cards">
-        <div id="image-list-container">
-            {% include "partial/image_list.html" %}
-        </div>
-    </section>
-    <div id="app-modal" class="modal">
-        <div class="modal-background"></div>
-        <div class="modal-content">
-        </div>
-        <button id="image-model-close-button" class="modal-close is-large" aria-label="close"></button>
-    </div>
-</div>
-
-{% endblock %}
-{% block scripts %}
-<script type="module" src="js/pages/home.js"></script>
-{% endblock %}
+    {% endblock %}
+    {% block scripts %}
+    <script type="module" src="js/pages/home.js"></script>
+    {% endblock %}

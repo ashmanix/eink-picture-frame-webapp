@@ -1,12 +1,5 @@
+import { uploadImage, updateAllDetails } from "../utils/api.js";
 import {
-  // updateList,
-  // deleteImage,
-  // setImage,
-  uploadImage,
-  updateAllDetails,
-} from "../utils/api.js";
-import {
-  // openModal,
   getModalTarget,
   closeAllModals,
   attachModelCloseEvents,
@@ -17,8 +10,19 @@ import { setNotification } from "../pages/base.js";
 import { imageListSetup, runImageSearch } from "../components/image-list.js";
 import { bus } from "../utils/bus.js";
 
+let uploadButton;
+let clearUploadSelectionButton;
+let fileInput;
+let fileName;
+let files = [];
+
 const handleImageEvents = async (event) => {
   switch (event.type) {
+    case "image-delete":
+      console.log("Image delete!: ", event);
+      closeAllModals();
+      openModal(getModalTarget(), event.detail.modalContent);
+      break;
     case "image-deleted":
       console.log("Image deleted!: ", event);
       closeAllModals();
@@ -41,6 +45,7 @@ const handleImageEvents = async (event) => {
     setNotification(event.detail.message, event.detail.type);
 };
 
+bus.addEventListener("image-delete", handleImageEvents);
 bus.addEventListener("image-deleted", handleImageEvents);
 bus.addEventListener("image-delete-selected", handleImageEvents);
 bus.addEventListener("image-uploaded", handleImageEvents);
@@ -54,54 +59,75 @@ const refreshPage = async () => {
   attachModelCloseEvents();
 };
 
+const clearImageUploadSelection = () => {
+  fileInput.value = "";
+  fileName.textContent = "Nothing selected";
+  uploadButton.disabled = true;
+  clearUploadSelectionButton.disabled = true;
+  uploadButton?.classList.remove("is-loading");
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   attachModelCloseEvents();
   await imageListSetup();
   await runImageSearch();
-});
 
-const uploadButton = document.getElementById("upload-button");
-const fileInput = document.querySelector(
-  "#upload-image-input input[type=file]"
-);
-const fileName = document.querySelector("#upload-image-input .file-name");
+  uploadButton = document.getElementById("upload-button");
+  clearUploadSelectionButton = document.getElementById(
+    "clear-image-selection-button"
+  );
+  fileInput = document.querySelector("#upload-image-input input[type=file]");
+  fileName = document.querySelector("#upload-image-input .file-name");
 
-let file = null;
+  fileInput.onchange = () => {
+    if (fileInput.isDefaultNamespace.length > 0) {
+      const fileArray = Array.from(fileInput.files);
+      let names = "";
+      console.log("FilesArray: ", fileArray);
+      if (fileArray.length == 0) {
+        clearImageUploadSelection();
+        return;
+      }
+      for (const [index, file] of fileArray.entries()) {
+        names = names + `${file.name}`;
+        if (index < fileArray.length - 1) names = names + ",";
+      }
+      fileName.textContent = names;
+      uploadButton.disabled = false;
+      clearUploadSelectionButton.disabled = false;
+    } else {
+      console.log("Empty!");
+    }
+  };
 
-fileInput.onchange = () => {
-  if (fileInput.isDefaultNamespace.length > 0) {
-    file = fileInput.files[0];
-    fileName.textContent = file.name;
-    uploadButton.disabled = false;
-  }
-};
-
-uploadButton.addEventListener("click", async () => {
-  uploadButton.classList.toggle("is-loading");
-  const file = fileInput.files[0];
-  const filename = file?.name;
-  if (!file) {
-    setNotification(`Select an image for upload`, "is-warning");
+  uploadButton.addEventListener("click", async () => {
     uploadButton.classList.toggle("is-loading");
-    return;
-  }
-  closeAllModals();
-  const result = await uploadImage(file);
+    const files = [...fileInput.files];
+    const filename = file?.name;
+    if (!files?.length) {
+      setNotification(`Select images for upload`, "is-warning");
+      uploadButton.classList.toggle("is-loading");
+      return;
+    }
+    closeAllModals();
+    const result = await uploadImage(file);
 
-  if (result?.error) {
-    setNotification(
-      createErrorMessage(
-        `Error attempting to upload <strong>${filename}</strong>`,
-        result
-      ),
-      "is-danger"
-    );
-  } else {
-    refreshPage();
-    setNotification(`${filename} uploaded successfully`, "is-success");
-  }
-  fileInput.value = "";
-  fileName.textContent = "No Image Selected";
-  uploadButton.disabled = true;
-  uploadButton.classList.toggle("is-loading");
+    if (result?.error) {
+      setNotification(
+        createErrorMessage(
+          `Error attempting to upload <strong>${filename}</strong>`,
+          result
+        ),
+        "is-danger"
+      );
+    } else {
+      refreshPage();
+      setNotification(`${filename} uploaded successfully`, "is-success");
+    }
+    clearImageUploadSelection();
+  });
+
+  clearUploadSelectionButton.addEventListener("click", () => {
+    clearImageUploadSelection();
+  });
 });

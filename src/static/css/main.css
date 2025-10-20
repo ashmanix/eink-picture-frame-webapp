@@ -25,6 +25,11 @@ body {
     padding-top: 1rem;
 }
 
+.image-filename {
+    overflow-x: auto;
+    text-overflow: ellipsis;
+}
+
 .thumb-container {
     width: 150px;
     max-height: 128px;
@@ -69,10 +74,20 @@ body {
 }
 
 
-#notification-container {
+#notification-container,
+.notification-container {
     margin: 2rem 2rem;
 }
 
 #app-modal {
     z-index: 31;
+}
+
+.upload-image-container {
+    border: 3px dashed;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
 }

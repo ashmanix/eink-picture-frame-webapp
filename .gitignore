@@ -11,7 +11,9 @@ wheels/
 
 .vscode
 .env
-images
+src/static/images/*
+!src/static/images/logo.svg
+!src/static/images/favicon.ico
 
 # MacOS-generated filers
 .DS_store
