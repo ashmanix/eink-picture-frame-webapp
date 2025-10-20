@@ -14,12 +14,16 @@
 
     <div class="notification">
         <div class="upload-image-container">
-            <div class="is-flex-direction-column ">
-                <span class="icon is-large is-hidden-mobile">
-                    <i class="fas fa-2x fa-upload"></i>
-                </span>
-                <p class="title is-size-4 is-hidden-mobile">Drag and Drop to Upload File</p>
-                <p class="title is-size-4 is-hidden-mobile">OR</p>
+            <div class="is-flex-direction-column">
+                <div id="upload-images-main-text" class="is-hidden-mobile mb-4">
+                    <span class="icon is-large">
+                        <i class="fas fa-2x fa-upload"></i>
+                    </span>
+                    <p class="title is-size-4 is-hidden-mobile">Drag and Drop to Upload File</p>
+                    <p class="title is-size-4 is-hidden-mobile">OR</p>
+                </div>
+                <div class="is-hidden" id="selected-images-container">
+                </div>
                 <div id="upload-image-input" class="file is-centered is-link">
                     <label class="file-label">
                         <input class="file-input" type="file" name="image file upload" accept="{{ allowed_extensions }}"

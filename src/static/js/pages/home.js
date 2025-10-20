@@ -12,9 +12,9 @@ import { bus } from "../utils/bus.js";
 
 let uploadButton;
 let clearUploadSelectionButton;
+let uploadImageMainText;
 let fileInput;
-let fileName;
-let files = [];
+let fileNamesListContainer;
 
 const handleImageEvents = async (event) => {
   switch (event.type) {
@@ -61,10 +61,20 @@ const refreshPage = async () => {
 
 const clearImageUploadSelection = () => {
   fileInput.value = "";
-  fileName.textContent = "Nothing selected";
   uploadButton.disabled = true;
   clearUploadSelectionButton.disabled = true;
   uploadButton?.classList.remove("is-loading");
+  fileNamesListContainer.innerHTML = "";
+};
+
+const toggleUploadImageView = (showView) => {
+  if (showView === true) {
+    fileNamesListContainer.classList.add("is-hidden");
+    uploadImageMainText.classList.remove("is-hidden");
+  } else {
+    fileNamesListContainer.classList.remove("is-hidden");
+    uploadImageMainText.classList.add("is-hidden");
+  }
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -77,52 +87,76 @@ document.addEventListener("DOMContentLoaded", async () => {
     "clear-image-selection-button"
   );
   fileInput = document.querySelector("#upload-image-input input[type=file]");
-  fileName = document.querySelector("#upload-image-input .file-name");
+  fileNamesListContainer = document.getElementById("selected-images-container");
+  uploadImageMainText = document.getElementById("upload-images-main-text");
 
   fileInput.onchange = () => {
     if (fileInput.isDefaultNamespace.length > 0) {
       const fileArray = Array.from(fileInput.files);
-      let names = "";
-      console.log("FilesArray: ", fileArray);
       if (fileArray.length == 0) {
+        toggleUploadImageView(true);
         clearImageUploadSelection();
         return;
       }
-      for (const [index, file] of fileArray.entries()) {
-        names = names + `${file.name}`;
-        if (index < fileArray.length - 1) names = names + ",";
+      fileNamesListContainer.innerHTML = "";
+      toggleUploadImageView(false);
+      const listContainerElement = document.createElement("div");
+      listContainerElement.classList.add("mb-4");
+      const paragraphElement = document.createElement("p");
+      paragraphElement.textContent = "Images selected";
+      paragraphElement.classList.add("subtitle");
+      listContainerElement.appendChild(paragraphElement);
+      for (const file of fileArray) {
+        const listItemElement = document.createElement("p");
+        listItemElement.textContent = file.name;
+        listItemElement.classList.add("subtitle", "is-size-6");
+        listContainerElement.appendChild(listItemElement);
+        fileNamesListContainer.appendChild(listContainerElement);
       }
-      fileName.textContent = names;
+
       uploadButton.disabled = false;
       clearUploadSelectionButton.disabled = false;
-    } else {
-      console.log("Empty!");
     }
   };
 
   uploadButton.addEventListener("click", async () => {
     uploadButton.classList.toggle("is-loading");
-    const files = [...fileInput.files];
-    const filename = file?.name;
-    if (!files?.length) {
+    const fileArray = Array.from(fileInput.files);
+    if (!fileArray?.length) {
       setNotification(`Select images for upload`, "is-warning");
       uploadButton.classList.toggle("is-loading");
       return;
     }
     closeAllModals();
-    const result = await uploadImage(file);
+    clearUploadSelectionButton.disabled = true;
+    fileInput.disabled = true;
+    const failedUploads = [];
+    for (const file of fileArray) {
+      const result = await uploadImage(file);
+      if (result.error) {
+        failedUploads.push({
+          filename: file.name,
+          result,
+        });
+      }
+    }
+    clearUploadSelectionButton.disabled = false;
+    fileInput.disabled = false;
 
-    if (result?.error) {
-      setNotification(
-        createErrorMessage(
-          `Error attempting to upload <strong>${filename}</strong>`,
-          result
-        ),
-        "is-danger"
-      );
+    if (failedUploads?.length) {
+      let errorMessage = "";
+      for (const uploadRes of failedUploads) {
+        if (errorMessage) errorMessage += "</br>";
+
+        errorMessage += createErrorMessage(
+          `File: ${uploadRes?.filename} failed to upload.`,
+          uploadRes.result
+        );
+      }
+      setNotification(errorMessage, "is-danger");
     } else {
       refreshPage();
-      setNotification(`${filename} uploaded successfully`, "is-success");
+      setNotification(`Files uploaded successfully`, "is-success");
     }
     clearImageUploadSelection();
   });
