@@ -13,6 +13,7 @@ import { bus } from "../utils/bus.js";
 let uploadButton;
 let clearUploadSelectionButton;
 let uploadImageMainText;
+let uploadImageContainer;
 let fileInput;
 let fileNamesListContainer;
 
@@ -65,6 +66,7 @@ const clearImageUploadSelection = () => {
   clearUploadSelectionButton.disabled = true;
   uploadButton?.classList.remove("is-loading");
   fileNamesListContainer.innerHTML = "";
+  toggleUploadImageView(true);
 };
 
 const toggleUploadImageView = (showView) => {
@@ -163,5 +165,71 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   clearUploadSelectionButton.addEventListener("click", () => {
     clearImageUploadSelection();
+  });
+
+  uploadImageContainer = document.querySelector(".upload-image-container");
+
+  let dragDepth = 0;
+
+  uploadImageContainer.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const items = event.dataTransfer.items;
+    let hasImage = false;
+
+    for (const item of items) {
+      if (item.kind === "file" && item.type.startsWith("image/")) {
+        hasImage = true;
+        break;
+      }
+    }
+
+    if (hasImage) {
+      uploadImageContainer.classList.add("is-dragover");
+    } else {
+      uploadImageContainer.classList.remove("is-dragover");
+    }
+  });
+
+  uploadImageContainer.addEventListener("dragenter", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const items = event.dataTransfer.items;
+    let hasImage = false;
+
+    for (const item of items) {
+      if (item.kind === "file" && item.type.startsWith("image/")) {
+        hasImage = true;
+        break;
+      }
+    }
+
+    if (hasImage && ++dragDepth === 1) {
+      uploadImageContainer.classList.add("is-dragover");
+    }
+  });
+
+  uploadImageContainer.addEventListener("dragleave", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (--dragDepth === 0) uploadImageContainer.classList.remove("is-dragover");
+  });
+
+  uploadImageContainer.addEventListener("drop", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    uploadImageContainer.classList.remove("is-dragover");
+
+    const dataTransfer = new DataTransfer();
+    for (const file of fileInput.files) dataTransfer.items.add(file);
+    for (const file of event.dataTransfer.files) {
+      if (file.type.startsWith("image/")) dataTransfer.items.add(file);
+    }
+
+    fileInput.files = dataTransfer.files;
+    fileInput.dispatchEvent(new Event("change"));
   });
 });
