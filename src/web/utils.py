@@ -12,6 +12,7 @@ from web.models import (
     FileDeletionResults,
     PictureFrameImage,
     StorageSpaceDetails,
+    ImageQueryResult,
 )
 from web.constants import FILENAME_VALIDATION_REGEX, IMAGE_FOLDER_LOCATION
 from web.sql import get_item, delete_item, add_item, get_all, get_query
@@ -97,10 +98,6 @@ def save_image(filename: str, file: IO[bytes], session: Session):
 
     image_file_location = Path(f"{IMAGE_FOLDER_LOCATION}/{filename}")
 
-    # Create the images folder for the file if it doesn't already exist
-    # file_path = Path(image_file_location)
-    # file_path.parent.mkdir(parents=True, exist_ok=True)
-
     with open(image_file_location, "wb") as buffer:
         shutil.copyfileobj(file, buffer)
 
@@ -129,12 +126,12 @@ def set_display_image(id: int, session: Session):
 
 
 def get_image_list(
-    session: Session, search: str | None = None
-) -> List[PictureFrameImage]:
+    session: Session, search: str | None = None, page_no: int = 0, page_size: int = 25
+) -> ImageQueryResult:
     if search:
-        return get_query(session, search)
+        return get_query(session, search, page_no, page_size)
 
-    return get_all(session)
+    return get_all(session, page_no, page_size)
 
 
 def format_datetime(value, format="%d-%m-%Y %H:%M"):

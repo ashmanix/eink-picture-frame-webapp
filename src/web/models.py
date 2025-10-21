@@ -38,6 +38,11 @@ class PictureFrameImage(SQLModel, table=True):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class ImageQueryResult(BaseModel):
+    items: List[PictureFrameImage]
+    total: int
+
+
 class StorageSpaceDetails(BaseModel):
     total: float
     used: float

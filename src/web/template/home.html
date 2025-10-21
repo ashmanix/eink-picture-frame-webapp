@@ -12,7 +12,7 @@
         </h2>
     </div>
 
-    <div class="notification">
+    <div class="notifications">
         <div class="upload-image-container">
             <div class="is-flex-direction-column">
                 <div id="upload-images-main-text" class="is-hidden-mobile mb-4">
@@ -74,24 +74,29 @@
                 </div>
             </div>
             <div class="level-right">
-                <div class="buttons">
-                    <button class="level-item button set-image-button is-danger is-outlined is-responsive"
-                        id="delete-all-button" title="Delete all selected images" disabled>
-                        <span class="icon is-small has-text-danger">
-                            <i class="fas fa-trash"></i>
-                        </span>
-                    </button>
-                    <button class="button is-responsive" id="select-all-toggle-button"
-                        title="Toggle selecting all images">
-                        <span class="icon is-small">
-                            <i class="fas fa-check-double"></i>
-                        </span>
-                    </button>
-                    <button class="button is-responsive" id="refresh-list-button" title="Refresh list">
-                        <span class="icon is-small">
-                            <i class="fas fa-rotate-right"></i>
-                        </span>
-                    </button>
+                <div class="field has-addons level-item">
+                    <p class="control">
+                        <button class="button delete-image-button" id="delete-all-button"
+                            title="Delete all selected images" disabled>
+                            <span class="icon is-small">
+                                <i class="fas fa-trash"></i>
+                            </span>
+                        </button>
+                    </p>
+                    <p class="control">
+                        <button class="button" id="select-all-toggle-button" title="Toggle selecting all images">
+                            <span class="icon is-small">
+                                <i class="fas fa-check-double"></i>
+                            </span>
+                        </button>
+                    </p>
+                    <p class="control">
+                        <button class="button" id="refresh-list-button" title="Refresh list">
+                            <span class="icon is-small">
+                                <i class="fas fa-rotate-right"></i>
+                            </span>
+                        </button>
+                    </p>
                 </div>
             </div>
         </div>

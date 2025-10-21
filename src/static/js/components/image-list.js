@@ -50,13 +50,11 @@ const toggleEnableImageButtons = (id, enable) => {
 
   const checkBox = document.querySelector(`.image-checkbox[data-id="${id}"]`);
 
-  const progressBar = document.querySelector(`.progress[data-id="${id}"]`);
+  const tableRow = document.querySelector(`tr[data-id="${id}"]`);
   if (enable) {
-    progressBar.classList.add("is-invisible");
-    progressBar.value = null;
+    tableRow.classList.remove("is-skeleton");
   } else {
-    progressBar.classList.remove("is-invisible");
-    progressBar.attributes.removeNamedItem("value");
+    tableRow.classList.add("is-skeleton");
   }
 
   for (const btn of [deleteButton, setButton, checkBox]) {

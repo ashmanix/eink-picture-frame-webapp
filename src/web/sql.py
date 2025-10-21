@@ -1,7 +1,7 @@
-from sqlmodel import Session, SQLModel, create_engine, select
+from sqlmodel import Session, SQLModel, create_engine, select, func
 from typing import List
 from fastapi import Depends
-from web.models import PictureFrameImage
+from web.models import PictureFrameImage, ImageQueryResult
 
 
 sqlite_file_name = "image_database.db"
@@ -27,21 +27,30 @@ def get_item(id: int, session: Session) -> PictureFrameImage:
     return image
 
 
-def get_all(session: Session) -> List[PictureFrameImage]:
-    statement = select(PictureFrameImage)
-    results = session.exec(statement=statement).all()
-    return results
+def get_all(session: Session, page_no: int, page_size: int) -> ImageQueryResult:
+    total = session.exec(select(func.count()).select_from(PictureFrameImage)).one()
+
+    statement = select(PictureFrameImage).offset(page_no * page_size).limit(page_size)
+    results = session.exec(statement=statement)
+    return ImageQueryResult(items=results, total=total)
 
 
-def get_query(session: Session, search: str) -> List[PictureFrameImage]:
+def get_query(
+    session: Session, search: str, page_no: int, page_size: int
+) -> ImageQueryResult:
     if not search:
-        return get_all(session)
+        return get_all(session, page_no, page_size)
 
-    statement = select(PictureFrameImage).where(
+    base_query = select(PictureFrameImage).where(
         PictureFrameImage.filename.like(f"%{search}%")
     )
+
+    statement = base_query.offset(page_no * page_size).limit(page_size)
+
+    total = session.exec(select(func.count()).select_from(base_query.subquery())).one()
+
     results = session.exec(statement).all()
-    return results
+    return ImageQueryResult(items=results, total=total)
 
 
 def add_item(filename: str, session: Session) -> PictureFrameImage:

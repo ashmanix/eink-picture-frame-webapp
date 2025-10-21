@@ -10,12 +10,13 @@ from fastapi import (
     Depends,
     status,
     Form,
+    Query,
 )
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-from web.models import PictureFrameImage
+from web.models import ImageQueryResult
 from web.sql import create_db_and_tables, get_all, get_session
 from dotenv import load_dotenv
 from sqlmodel import Session
@@ -85,7 +86,13 @@ async def get_login_page(request: Request):
 
 
 @app.get("/", response_class=HTMLResponse, description="Get home page")
-async def root(request: Request, session: SessionDep, search: str | None = None):
+async def root(
+    request: Request,
+    # session: SessionDep,
+    # search: str | None = None,
+    # page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
+    # page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
+):
     storage = get_remaining_storage_space()
     return templates.TemplateResponse(
         request=request,
@@ -113,15 +120,20 @@ async def get_storage_partial(request: Request):
 
 @app.get("/image_list/partial", description="Get image list partial")
 async def get_list_partial(
-    request: Request, session: SessionDep, search: str | None = None
+    request: Request,
+    session: SessionDep,
+    search: str | None = None,
+    page_no: Annotated[int | None, Query(alias="pageNo")] = 0,
+    page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
 ):
     try:
-        image_list: List[PictureFrameImage] = get_image_list(session, search)
+        result: ImageQueryResult = get_image_list(session, search, page_no, page_size)
         return templates.TemplateResponse(
             request=request,
             name="partial/image_list.html",
             context={
-                "image_list": image_list,
+                "image_list": result.items,
+                "total": result.total,
                 "allowed_extensions": ALLOWED_EXTENSIONS,
             },
         )
@@ -175,6 +187,7 @@ def logout(request: Request):
 @app.post("/image/delete/", description="Delete multiple images from device")
 async def delete_list_of_images(files: list[int], session: SessionDep):
     try:
+        sleep(2)
         results = delete_image_list(files, session)
         return results
 
@@ -187,7 +200,8 @@ async def delete_an_image(
     id: int,
     session: SessionDep,
 ):
-    try:  #
+    try:
+        sleep(2)
         delete_image(id, session)
         return {"result": "successful"}
 
