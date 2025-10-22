@@ -1,5 +1,5 @@
 <div>
-    {% if not image_list %}
+    {% if not imageList %}
     <div class="notification">
         <h5 class="title is-5 has-text-centered">No images found</h5>
     </div>
@@ -21,7 +21,7 @@
                 </thead>
                 <tbody>
 
-                    {% for image in image_list %}
+                    {% for image in imageList %}
                     <tr data-id="{{ image.id }}" class="image-details-row" data-id="{{ image.id }}"
                         data-filename="{{ image.filename }}">
                         <td>
@@ -81,4 +81,46 @@
         </div>
     </div>
     {% endif %}
+    <nav class="pagination is-right mt-4" role="navigation" aria-label="pagination">
+        {% if pageNo > 1 %}
+        <a href="?search={{ search }}&pageNo={{ pageNo - 1 }}&pageSize={{ pageSize }}"
+            class="pagination-previous">Previous</a>
+        {% endif %}
+        {% if pageNo < totalPages %} <a href="?search={{ search }}&pageNo={{ pageNo + 1 }}&pageSize={{ pageSize }}"
+            class="pagination-next">Next
+            page</a>
+            {% endif %}
+            <ul class="pagination-list">
+                {% if pageNo - 2 > 0%}
+                <li><a href="?search={{ search }}&pageNo={{ pageNo - 2 }}&pageSize={{ pageSize }}"
+                        class="pagination-link" aria-label="Goto page {{ pageNo - 2 }}">{{ pageNo - 2 }}</a>
+                </li>
+                {% if pageNo > 3 %}
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+                {% endif %}
+                {% endif %}
+                {% if pageNo - 1 > 0 %}
+                <li><a href="?search={{ search }}&pageNo={{ pageNo - 1 }}&pageSize={{ pageSize }}"
+                        class="pagination-link" aria-label="Goto page {{ pageNo - 1 }}">{{ pageNo - 1 }}</a>
+                </li>
+                {% endif %}
+                <li>
+                    <a class="pagination-link is-current" aria-label="Page {{ pageNo }}" aria-current="page">{{ pageNo
+                        }}</a>
+                </li>
+                {% if totalPages - pageNo > 0 %}
+                <li><a href="?search={{ search }}&pageNo={{ pageNo + 1 }}&pageSize={{ pageSize }}" class="
+                        pagination-link" aria-label="Goto page {{ pageNo + 1 }}">{{ pageNo + 1 }}</a>
+                </li>
+                {% endif %}
+                {% if totalPages - pageNo > 1 %}
+                {% if totalPages - (pageNo + 1) > 1 %}
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+                {% endif %}
+                <li><a href="?search={{ search }}&pageNo={{ pageNo + 2 }}&pageSize={{ pageSize }}" class="
+                        pagination-link" aria-label="Goto page {{ pageNo + 2 }}">{{ pageNo + 2 }}</a>
+                </li>
+                {% endif %}
+            </ul>
+    </nav>
 </div>

@@ -91,7 +91,7 @@ async def root(
     session: SessionDep,
     search: str | None = None,
     page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
-    page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
+    page_size: Annotated[int | None, Query(alias="pageSize")] = 2,
 ):
     result: ImageQueryResult = get_image_list(session, search, page_no, page_size)
     storage = get_remaining_storage_space()
@@ -99,9 +99,12 @@ async def root(
         request=request,
         name="home.html",
         context={
-            "image_list": result.items,
+            "imageList": result.items,
+            "totalPages": round(result.total / page_size),
+            "pageNo": page_no,
+            "pageSize": page_size,
             "storage": storage,
-            "allowed_extensions": ALLOWED_EXTENSIONS,
+            "allowedExtensions": ALLOWED_EXTENSIONS,
         },
     )
 
@@ -125,7 +128,7 @@ async def get_list_partial(
     session: SessionDep,
     search: str | None = None,
     page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
-    page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
+    page_size: Annotated[int | None, Query(alias="pageSize")] = 2,
 ):
     try:
         result: ImageQueryResult = get_image_list(session, search, page_no, page_size)
@@ -133,9 +136,11 @@ async def get_list_partial(
             request=request,
             name="partial/image_list.html",
             context={
-                "image_list": result.items,
-                "total": result.total,
-                "allowed_extensions": ALLOWED_EXTENSIONS,
+                "imageList": result.items,
+                "totalPages": round(result.total / page_size),
+                "pageNo": page_no,
+                "pageSize": page_size,
+                "allowedExtensions": ALLOWED_EXTENSIONS,
             },
         )
     except Exception as err:
