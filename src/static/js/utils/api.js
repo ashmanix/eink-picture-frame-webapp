@@ -140,7 +140,9 @@ const callAPI = async (
       throw new Error(`Login required`);
     }
 
-    if (!response.ok) {
+    if (response.redirected) {
+      globalThis.location.href = response.url;
+    } else if (!response.ok) {
       responseBody = await response.json();
       throw new Error(`Error ${callType}`);
     }

@@ -1,5 +1,5 @@
 from time import sleep
-from typing import Annotated, List
+from typing import Annotated
 from fastapi import (
     FastAPI,
     Path,
@@ -13,7 +13,7 @@ from fastapi import (
     Query,
 )
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from web.models import ImageQueryResult
@@ -72,7 +72,7 @@ async def auth_middleware(request: Request, call_next):
         validate_token(request)
 
     except HTTPException as err:
-        return JSONResponse({"detail": "Authorisation Error"}, status_code=401)
+        return RedirectResponse(url="/login", status_code=303)
 
     except Exception as err:
         return JSONResponse({"detail": "Internal Server Error"}, status_code=500)
