@@ -100,6 +100,8 @@ export const imageListSetup = async () => {
     const imageButton = event.target.closest(".thumb-container");
 
     if (imageButton) {
+      event.stopPropagation();
+      event.preventDefault();
       const filename = imageButton.dataset.filename;
       const imageContainerElement = document.createElement("div");
       imageContainerElement.classList.add("modal-image");
@@ -109,6 +111,7 @@ export const imageListSetup = async () => {
       imageContainerElement.appendChild(imageElement);
 
       sendBusEvent("image-clicked", null, null, imageContainerElement);
+      return;
     }
 
     const imageDetailsRow = event.target.closest(".image-details-row");
