@@ -48,8 +48,6 @@ const toggleEnableImageButtons = (id, enable) => {
     `.set-image-button[data-id="${id}"]`
   );
 
-  const checkBox = document.querySelector(`.image-checkbox[data-id="${id}"]`);
-
   const tableRow = document.querySelector(`tr[data-id="${id}"]`);
   if (enable) {
     tableRow.classList.remove("is-skeleton");
@@ -57,7 +55,7 @@ const toggleEnableImageButtons = (id, enable) => {
     tableRow.classList.add("is-skeleton");
   }
 
-  for (const btn of [deleteButton, setButton, checkBox]) {
+  for (const btn of [deleteButton, setButton]) {
     if (btn) btn.disabled = !enable;
   }
 };
@@ -94,21 +92,9 @@ export const imageListSetup = async () => {
     if (deleteButton) {
       const id = deleteButton.dataset.id;
       const filename = deleteButton.dataset.filename;
-      // toggleEnableImageButtons(id, false);
 
       const modalContent = createDeleteConfirmation({ id, filename });
       sendBusEvent("image-delete", null, null, modalContent);
-      // const result = await deleteImage(id);
-      // if (result?.error) {
-      //   const message = createErrorMessage(
-      //     `Error attempting to delete ${filename}`,
-      //     result
-      //   );
-      //   sendBusEvent("image-deleted", message, "is-error");
-      // } else {
-      //   const message = `${filename} deleted successfully`;
-      //   sendBusEvent("image-deleted", message, "is-success");
-      // }
     }
 
     const imageButton = event.target.closest(".thumb-container");
@@ -124,21 +110,24 @@ export const imageListSetup = async () => {
 
       sendBusEvent("image-clicked", null, null, imageContainerElement);
     }
-    const imageCheckBox = event.target.closest(".image-checkbox");
 
-    if (imageCheckBox) {
-      if (imageCheckBox?.checked === true) {
+    const imageDetailsRow = event.target.closest(".image-details-row");
+
+    if (imageDetailsRow) {
+      imageDetailsRow.classList.toggle("is-selected");
+
+      if (imageDetailsRow?.classList.contains("is-selected") === true) {
         addImageToList(
-          imageCheckBox?.dataset?.id,
-          imageCheckBox?.dataset?.filename
+          imageDetailsRow?.dataset?.id,
+          imageDetailsRow?.dataset?.filename
         );
-      } else if (imageCheckBox?.checked === false) {
-        removeImageFromList(imageCheckBox?.dataset?.id);
+      } else {
+        removeImageFromList(imageDetailsRow?.dataset?.id);
       }
     }
   });
 
-  searchButton.addEventListener("click", (event) => {
+  searchButton.addEventListener("click", () => {
     const searchValue = searchInput.value;
 
     if (searchValue) {
@@ -174,28 +163,35 @@ export const imageListSetup = async () => {
 
     const modalContent = createMultipleDeleteConfirmation(selectedImages);
     sendBusEvent("image-delete-selected", null, null, modalContent);
+    selectedImages = [];
+    deleteAllButton.disabled = true;
   });
 
   selectAllToggleButton.addEventListener("click", async () => {
-    if (selectedImages?.length > 0) {
-      for (const image of selectedImages) {
-        console.log(image.id);
-        const imageCheckBox = document.querySelector(
-          `.image-checkbox[data-id="${image.id}"]`
-        );
-        console.log(imageCheckBox);
-        if (imageCheckBox) {
-          removeImageFromList(image.id);
-          imageCheckBox.checked = false;
-        }
+    let isSelection = false;
+    const allRows = document.querySelectorAll(".image-details-row");
+
+    const selectedRows = document.querySelectorAll(
+      ".image-details-row.is-selected"
+    );
+
+    if (selectedRows?.length) isSelection = true;
+
+    if (isSelection === false) {
+      for (const row of allRows) {
+        row.classList.add("is-selected");
+        addImageToList(row.dataset.id, row.dataset.filename);
       }
     } else {
-      const imageCheckBoxList = document.querySelectorAll(".image-checkbox");
-      for (const checkbox of imageCheckBoxList) {
-        addImageToList(checkbox?.dataset?.id, checkbox?.dataset?.filename);
-        checkbox.checked = true;
+      for (const row of selectedRows) {
+        row.classList.remove("is-selected");
+        removeImageFromList(row.dataset.id);
       }
     }
+
+    isSelection = !isSelection;
+
+    deleteAllButton.disabled = !isSelection;
   });
 };
 
@@ -274,7 +270,7 @@ const createMultipleDeleteConfirmation = (imagesToDelete) => {
   const list = document.createElement("ul");
   list.classList.add("mb-4");
 
-  for (const [index, image] of imagesToDelete.entries()) {
+  for (const [, image] of imagesToDelete.entries()) {
     const li = document.createElement("li");
     li.textContent = image.filename;
     list.appendChild(li);

@@ -30,7 +30,9 @@ def get_item(id: int, session: Session) -> PictureFrameImage:
 def get_all(session: Session, page_no: int, page_size: int) -> ImageQueryResult:
     total = session.exec(select(func.count()).select_from(PictureFrameImage)).one()
 
-    statement = select(PictureFrameImage).offset(page_no * page_size).limit(page_size)
+    statement = (
+        select(PictureFrameImage).offset((page_no - 1) * page_size).limit(page_size)
+    )
     results = session.exec(statement=statement)
     return ImageQueryResult(items=results, total=total)
 
@@ -45,7 +47,7 @@ def get_query(
         PictureFrameImage.filename.like(f"%{search}%")
     )
 
-    statement = base_query.offset(page_no * page_size).limit(page_size)
+    statement = base_query.offset((page_no - 1) * page_size).limit(page_size)
 
     total = session.exec(select(func.count()).select_from(base_query.subquery())).one()
 

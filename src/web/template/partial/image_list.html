@@ -6,7 +6,7 @@
     {% else %}
     <div id="image-list">
         <div class="table-container">
-            <table class="table is-bordered is-fullwidth is-outlined">
+            <table class="table is-bordered is-fullwidth is-outlined is-hoverable">
                 <thead>
                     <th>
                         <div class="tooltip">
@@ -18,17 +18,12 @@
                     <th class="is-hidden-mobile">ID</th>
                     <th class="is-hidden-mobile">Created</th>
                     <th>Options</th>
-                    <th>
-                        <div class="tooltip">
-                            Sel
-                            <span class="tooltiptext">Select</span>
-                        </div>
-                    </th>
                 </thead>
                 <tbody>
 
                     {% for image in image_list %}
-                    <tr data-id="{{ image.id }}">
+                    <tr data-id="{{ image.id }}" class="image-details-row" data-id="{{ image.id }}"
+                        data-filename="{{ image.filename }}">
                         <td>
                             <figure>
                                 <p class="image thumb-container is-128x128 is-hidden-mobile"
@@ -78,13 +73,6 @@
                                     </button>
                                 </p>
                             </div>
-                        </td>
-                        <td>
-                            <label class="checkbox ml-3 mr-3" data-id="{{ image.id }}"
-                                data-filename="{{ image.filename }}">
-                                <input class="image-checkbox" data-id="{{ image.id }}"
-                                    data-filename="{{ image.filename }}" type="checkbox" />
-                            </label>
                         </td>
                     </tr>
                     {% endfor %}

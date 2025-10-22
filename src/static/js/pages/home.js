@@ -20,23 +20,19 @@ let fileNamesListContainer;
 const handleImageEvents = async (event) => {
   switch (event.type) {
     case "image-delete":
-      console.log("Image delete!: ", event);
       closeAllModals();
       openModal(getModalTarget(), event.detail.modalContent);
       break;
     case "image-deleted":
-      console.log("Image deleted!: ", event);
       closeAllModals();
       break;
     case "image-clicked":
-      console.log("Image clicked!: ", event);
       closeAllModals();
       openModal(getModalTarget(), event.detail.modalContent);
       break;
     case "image-delete-selected":
       closeAllModals();
       openModal(getModalTarget(), event.detail.modalContent);
-      console.log(event);
       break;
     case "close-modal":
       closeAllModals();
@@ -82,7 +78,7 @@ const toggleUploadImageView = (showView) => {
 document.addEventListener("DOMContentLoaded", async () => {
   attachModelCloseEvents();
   await imageListSetup();
-  await runImageSearch();
+  // await runImageSearch();
 
   uploadButton = document.getElementById("upload-button");
   clearUploadSelectionButton = document.getElementById(
@@ -133,10 +129,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     clearUploadSelectionButton.disabled = true;
     fileInput.disabled = true;
     const failedUploads = [];
+    const successUploads = [];
     for (const file of fileArray) {
       const result = await uploadImage(file);
       if (result.error) {
         failedUploads.push({
+          filename: file.name,
+          result,
+        });
+      } else {
+        successUploads.push({
           filename: file.name,
           result,
         });
@@ -156,6 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
       }
       setNotification(errorMessage, "is-danger");
+      if (successUploads.length) refreshPage();
     } else {
       refreshPage();
       setNotification(`Files uploaded successfully`, "is-success");

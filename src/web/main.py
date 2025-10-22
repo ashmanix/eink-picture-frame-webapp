@@ -88,17 +88,18 @@ async def get_login_page(request: Request):
 @app.get("/", response_class=HTMLResponse, description="Get home page")
 async def root(
     request: Request,
-    # session: SessionDep,
-    # search: str | None = None,
-    # page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
-    # page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
+    session: SessionDep,
+    search: str | None = None,
+    page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
+    page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
 ):
+    result: ImageQueryResult = get_image_list(session, search, page_no, page_size)
     storage = get_remaining_storage_space()
     return templates.TemplateResponse(
         request=request,
         name="home.html",
         context={
-            "image_list": [],
+            "image_list": result.items,
             "storage": storage,
             "allowed_extensions": ALLOWED_EXTENSIONS,
         },
@@ -123,7 +124,7 @@ async def get_list_partial(
     request: Request,
     session: SessionDep,
     search: str | None = None,
-    page_no: Annotated[int | None, Query(alias="pageNo")] = 0,
+    page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
     page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
 ):
     try:

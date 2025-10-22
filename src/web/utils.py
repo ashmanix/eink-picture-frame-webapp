@@ -126,12 +126,9 @@ def set_display_image(id: int, session: Session):
 
 
 def get_image_list(
-    session: Session, search: str | None = None, page_no: int = 0, page_size: int = 25
+    session: Session, search: str | None = None, page_no: int = 1, page_size: int = 25
 ) -> ImageQueryResult:
-    if search:
-        return get_query(session, search, page_no, page_size)
-
-    return get_all(session, page_no, page_size)
+    return get_query(session, search, page_no, page_size)
 
 
 def format_datetime(value, format="%d-%m-%Y %H:%M"):
