@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await login(data.get("username"), data.get("password"));
 
-      if (result.error) {
+      if (result?.error) {
         for (const formInput of formInputs) {
           formInput?.input.classList.add("is-danger");
         }

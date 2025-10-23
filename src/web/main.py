@@ -31,7 +31,7 @@ from web.utils import (
     format_datetime,
     get_remaining_storage_space,
 )
-from web.constants import IMAGE_FOLDER_LOCATION, ALLOWED_EXTENSIONS
+from web.constants import IMAGE_FOLDER_LOCATION, ALLOWED_EXTENSIONS, TOKEN_TTL_SECS
 from web.auth import validate_token, check_credentials, issue_token, revoke_token
 
 from .logger import logger
@@ -61,7 +61,7 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
-    PUBLIC_PATHS = ["/login", "/logout", "/docs"]
+    PUBLIC_PATHS = ["/login", "/signin", "/logout", "/docs"]
     PUBLIC_PREFIXES = ["/css/", "/js/", "/webfonts/", "/images/", "/openapi"]
     path = request.url.path
     if path in PUBLIC_PATHS or any(path.startswith(p) for p in PUBLIC_PREFIXES):
@@ -70,10 +70,22 @@ async def auth_middleware(request: Request, call_next):
     try:
         validate_token(request)
 
-    except HTTPException as err:
-        return RedirectResponse(url="/login", status_code=303)
+    except HTTPException:
+        accept = request.headers.get("accept", "")
+        sec_mode = request.headers.get("sec-fetch-mode", "")
+        sec_dest = request.headers.get("sec-fetch-dest", "")
+        is_page_nav = (
+            ("text/html" in accept)
+            or (sec_mode == "navigate")
+            or (sec_dest == "document")
+        )
 
-    except Exception as err:
+        if is_page_nav:
+            return RedirectResponse(url="/login", status_code=303)
+
+        return JSONResponse({"detail": "Unauthorized"}, status_code=401)
+
+    except Exception:
         return JSONResponse({"detail": "Internal Server Error"}, status_code=500)
 
     return await call_next(request)
@@ -166,15 +178,27 @@ async def get_list_of_images(session: SessionDep):
         handle_error(err, f"Error getting list of images with error: {err}")
 
 
-@app.post("/login", description="Login to app with login details")
+@app.post("/signin", description="Login to app with login details")
 def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
     try:
         if not check_credentials(username=username, password=password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect login details",
+                detail="Invalid credentials",
             )
-        return {"token": issue_token()}
+
+        token = issue_token()
+
+        resp = RedirectResponse("/", status_code=303)
+        resp.set_cookie(
+            key="session",
+            value=token,
+            httponly=True,
+            secure=False,
+            samesite="Lax",
+            max_age=TOKEN_TTL_SECS,
+        )
+        return resp
 
     except Exception as err:
         handle_error(err, f"Error getting authorisation token: {err}")
@@ -183,7 +207,12 @@ def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
 @app.post("/logout", description="Logout of app")
 def logout(request: Request):
     try:
-        revoke_token(request)
+        token = request.cookies.get("session")
+        if token:
+            revoke_token(token)
+        resp = RedirectResponse("/login", status_code=303)
+        resp.delete_cookie("session")
+        return resp
 
     except Exception as err:
         handle_error(err, f"Error logging out: {err}")

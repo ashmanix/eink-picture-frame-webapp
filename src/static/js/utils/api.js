@@ -102,16 +102,18 @@ export const login = async (username, password) => {
   form.append("username", username);
   form.append("password", password);
 
-  const url = "/login";
+  const url = "/signin";
   const options = {
     method: "POST",
     body: form,
   };
   const result = await callAPI(url, options);
 
-  if (result?.error || !result?.token) return result;
+  // console.log("RRESULT: ", result);
 
-  sessionStorage.setItem(TOKEN_KEY, result.token);
+  if (result?.error) return result;
+
+  // sessionStorage.setItem(TOKEN_KEY, result.token);
   globalThis.location.replace("/");
 };
 
@@ -120,7 +122,7 @@ export const logout = async () => {
   const options = {
     method: "POST",
   };
-  const result = await callAPI(url, options);
+  const result = await callAPI(url, options, "loggin in");
 
   if (result?.error) return result;
 
@@ -136,9 +138,7 @@ const callAPI = async (
 ) => {
   let responseBody = {};
   try {
-    const token = sessionStorage.getItem(TOKEN_KEY);
-    const headers = { ...(options.headers || {}), "X-Session": token ?? "" };
-    const response = await fetch(url, { ...options, headers });
+    const response = await fetch(url, options);
 
     if (response.status === 401) {
       sessionStorage.removeItem(TOKEN_KEY);
@@ -148,6 +148,7 @@ const callAPI = async (
 
     if (response.redirected) {
       globalThis.location.href = response.url;
+      return;
     } else if (!response.ok) {
       responseBody = await response.json();
       throw new Error(`Error ${callType}`);

@@ -11,6 +11,10 @@ def _now():
     return time.time()
 
 
+def _extract_token(request: Request) -> str | None:
+    return request.cookies.get("session") or request.headers.get("X-Session")
+
+
 def check_credentials(username: str, password: str) -> bool:
     if not ADMIN_USER or not ADMIN_PASSWORD:
         return False
@@ -30,7 +34,13 @@ def revoke_token(token: str):
 
 
 def validate_token(request: Request):
-    token = request.headers.get("X-Session", "")
+    token = _extract_token(request)
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
+        )
+
+    # token = request.headers.get("X-Session", "")
     exp = TOKENS.get(token)
     if not exp or exp < _now():
         TOKENS.pop(token, None)
