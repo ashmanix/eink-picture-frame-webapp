@@ -1,4 +1,3 @@
-from time import sleep
 from typing import Annotated
 from fastapi import (
     FastAPI,
@@ -193,7 +192,6 @@ def logout(request: Request):
 @app.post("/image/delete/", description="Delete multiple images from device")
 async def delete_list_of_images(files: list[int], session: SessionDep):
     try:
-        sleep(2)
         results = delete_image_list(files, session)
         return results
 
@@ -207,7 +205,6 @@ async def delete_an_image(
     session: SessionDep,
 ):
     try:
-        sleep(2)
         delete_image(id, session)
         return {"result": "successful"}
 
@@ -240,7 +237,6 @@ async def set_current(
     session: SessionDep,
 ):
     try:
-        sleep(2)
         set_display_image(id, session)
         return {"result": "successful"}
     except Exception as err:
