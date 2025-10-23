@@ -85,17 +85,6 @@ const toggleEnableImageButtons = (id, enable) => {
   }
 };
 
-const updateUrlParams = (pageNo = null, pageSize = null, search = null) => {
-  const url = new URL(document.location);
-  const params = url.searchParams;
-
-  if (pageNo) params.set("pageNo", pageNo);
-  if (pageSize) params.set("pageSize", pageSize);
-  if (search) params.set("search", search);
-
-  history.replaceState(null, ", url");
-};
-
 const getParamsFromInitialUrl = () => {
   let params = new URLSearchParams(document.location.search);
   const searchParam = params.get("search");
@@ -225,8 +214,6 @@ export const imageListSetup = async () => {
 
     const modalContent = createMultipleDeleteConfirmation(selectedImages);
     sendBusEvent("image-delete-selected", null, null, modalContent);
-    selectedImages = [];
-    deleteAllButton.disabled = true;
   });
 
   selectAllToggleButton.addEventListener("click", async () => {
@@ -354,6 +341,7 @@ const createMultipleDeleteConfirmation = (imagesToDelete) => {
     sendBusEvent("close-modal");
     const result = await deleteMultipleImage(imageList);
     if (result?.error) {
+      deleteAllButton.disabled = false;
       for (const image of imagesToDelete) {
         toggleEnableImageButtons(image?.id, true);
       }
@@ -363,6 +351,8 @@ const createMultipleDeleteConfirmation = (imagesToDelete) => {
       );
       sendBusEvent("image-deleted", message, "is-danger");
     } else {
+      deleteAllButton.disabled = true;
+      selectedImages = [];
       sendBusEvent(
         "image-deleted",
         "Images deleted successfully",

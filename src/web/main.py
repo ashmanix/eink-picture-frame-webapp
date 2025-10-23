@@ -128,7 +128,7 @@ async def get_list_partial(
     session: SessionDep,
     search: str | None = None,
     page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
-    page_size: Annotated[int | None, Query(alias="pageSize")] = 2,
+    page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
 ):
     try:
         result: ImageQueryResult = get_image_list(session, search, page_no, page_size)

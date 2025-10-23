@@ -19,18 +19,12 @@ let fileNamesListContainer;
 
 const handleImageEvents = async (event) => {
   switch (event.type) {
-    case "image-delete":
-      closeAllModals();
-      openModal(getModalTarget(), event.detail.modalContent);
-      break;
     case "image-deleted":
       closeAllModals();
       break;
-    case "image-clicked":
-      closeAllModals();
-      openModal(getModalTarget(), event.detail.modalContent);
-      break;
     case "image-delete-selected":
+    case "image-clicked":
+    case "image-delete":
       closeAllModals();
       openModal(getModalTarget(), event.detail.modalContent);
       break;
