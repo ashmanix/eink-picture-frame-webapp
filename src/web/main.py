@@ -61,7 +61,7 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
-    PUBLIC_PATHS = ["/login", "/logout", "/", "/docs"]
+    PUBLIC_PATHS = ["/login", "/logout", "/docs"]
     PUBLIC_PREFIXES = ["/css/", "/js/", "/webfonts/", "/images/", "/openapi"]
     path = request.url.path
     if path in PUBLIC_PATHS or any(path.startswith(p) for p in PUBLIC_PREFIXES):
