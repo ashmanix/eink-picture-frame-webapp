@@ -1,0 +1,49 @@
+<nav class="pagination is-right mt-4" role="navigation" aria-label="pagination" data-page-no="{{ pageNo }}"
+        data-page-size="{{ pageSize }}" data-tota-pages="{{ totalPages }}">
+        {% if pageNo > 1 %}
+        <button class="pagination-previous is-hidden-mobile" data-page="{{ pageNo - 1 }}">Previous</button>
+        {% endif %}
+
+        {% if pageNo < totalPages %} <button class="pagination-next is-hidden-mobile" data-page="{{ pageNo + 1}}">Next
+                page</button>
+                {% endif %}
+                <ul class="pagination-list">
+                        {% if pageNo - 2 > 0%}
+                        <li><button class="pagination-link" aria-label="Goto page {{ 1 }}" data-page="{{ 1 }}">{{ 1
+                                        }}</button>
+                        </li>
+                        {% if pageNo > 3 %}
+                        <li><span class="pagination-ellipsis">&hellip;</span></li>
+                        {% endif %}
+                        {% endif %}
+                        {% if pageNo - 1 > 0 %}
+                        <li><button class="pagination-link" aria-label="Goto page {{ pageNo - 1 }}"
+                                        data-page="{{ pageNo - 1}}">{{ pageNo - 1
+                                        }}</button>
+                        </li>
+                        {% endif %}
+                        <li>
+                                <button class="pagination-link is-current" aria-label="Page {{ pageNo }}"
+                                        aria-current="page">{{ pageNo
+                                        }}</button>
+                        </li>
+                        {% if totalPages - pageNo > 0 %}
+                        <li>
+                                <button class="pagination-link" aria-label="Goto page {{ pageNo + 1 }}"
+                                        data-page="{{ pageNo + 1}}">{{
+                                        pageNo
+                                        +
+                                        1 }}</button>
+                        </li>
+                        {% endif %}
+                        {% if totalPages - pageNo > 1 %}
+                        {% if totalPages - (pageNo + 1) > 1 %}
+                        <li><span class="pagination-ellipsis">&hellip;</span></li>
+                        {% endif %}
+                        <li><button class="pagination-link" aria-label="Goto page {{ totalPages }}"
+                                        data-page="{{ totalPages }}">{{ totalPages
+                                        }}</button>
+                        </li>
+                        {% endif %}
+                </ul>
+</nav>

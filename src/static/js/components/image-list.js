@@ -15,16 +15,41 @@ let searchInput;
 let deleteAllButton;
 let selectAllToggleButton;
 let selectedImages = [];
+let search = null;
+let pageNo = 1;
+let pageSize = 25;
 
-export const runImageSearch = async (value = null, clearList = null) => {
+export const runImageSearch = async (clearList = false, pNo = pageNo) => {
   searchButton.classList.toggle("is-loading");
 
-  if (clearList) {
-    await updateList();
-  } else {
-    const searchValue = value ?? searchInput.value;
-    if (searchValue) {
-      const result = await updateList(searchValue);
+  const url = new URL(globalThis.location);
+  const prevSearch = url.searchParams.get("search") ?? "";
+  const searchValue = (searchInput.value || "").trim();
+
+  if (!clearList && searchValue !== prevSearch) pNo = 1;
+
+  try {
+    if (clearList || !searchValue) {
+      url.searchParams.delete("search");
+      url.searchParams.set("pageNo", pNo);
+      url.searchParams.set("pageSize", pageSize);
+      history.replaceState(null, "", url);
+
+      console.log(`Here, page no: ${pNo}, search value: ${searchValue}`);
+
+      const result = await updateList(null, pNo, pageSize);
+
+      if (result?.error) {
+        const message = createErrorMessage("Error loading image list", result);
+        sendBusEvent("image-search", message, "is-danger");
+      }
+    } else {
+      url.searchParams.set("search", searchValue);
+      url.searchParams.set("pageNo", pNo);
+      url.searchParams.set("pageSize", pageSize);
+      history.replaceState(null, "", url);
+
+      const result = await updateList(searchValue, pNo, pageSize);
       if (result?.error) {
         const message = createErrorMessage(
           "Error searching image list",
@@ -32,11 +57,12 @@ export const runImageSearch = async (value = null, clearList = null) => {
         );
         sendBusEvent("image-search", message, "is-danger");
       }
-    } else await updateList();
+    }
+    attachModelCloseEvents?.();
+    pageNo = pNo;
+  } finally {
+    searchButton.classList.toggle("is-loading");
   }
-  attachModelCloseEvents();
-
-  searchButton.classList.toggle("is-loading");
 };
 
 const toggleEnableImageButtons = (id, enable) => {
@@ -49,15 +75,35 @@ const toggleEnableImageButtons = (id, enable) => {
   );
 
   const tableRow = document.querySelector(`tr[data-id="${id}"]`);
-  if (enable) {
-    tableRow.classList.remove("is-skeleton");
-  } else {
-    tableRow.classList.add("is-skeleton");
-  }
 
-  for (const btn of [deleteButton, setButton]) {
-    if (btn) btn.disabled = !enable;
+  for (const element of [tableRow, deleteButton, setButton]) {
+    if (element) {
+      enable
+        ? element.classList.remove("is-skeleton")
+        : element.classList.add("is-skeleton");
+    }
   }
+};
+
+const updateUrlParams = (pageNo = null, pageSize = null, search = null) => {
+  const url = new URL(document.location);
+  const params = url.searchParams;
+
+  if (pageNo) params.set("pageNo", pageNo);
+  if (pageSize) params.set("pageSize", pageSize);
+  if (search) params.set("search", search);
+
+  history.replaceState(null, ", url");
+};
+
+const getParamsFromInitialUrl = () => {
+  let params = new URLSearchParams(document.location.search);
+  const searchParam = params.get("search");
+  if (searchParam) search = searchParam;
+  const pageNoParam = Number.parseInt(params.get("pageNo"));
+  if (pageNoParam) pageNo = pageNoParam;
+  const pageSizeParam = Number.parseInt(params.get("pageSize"));
+  if (pageSizeParam) pageSize = pageSizeParam;
 };
 
 export const imageListSetup = async () => {
@@ -66,6 +112,8 @@ export const imageListSetup = async () => {
   searchInput = document.getElementById("search-input");
   deleteAllButton = document.getElementById("delete-all-button");
   selectAllToggleButton = document.getElementById("select-all-toggle-button");
+
+  getParamsFromInitialUrl();
 
   const container = document.querySelector("#image-list-container");
   container.addEventListener("click", async (event) => {
@@ -86,6 +134,7 @@ export const imageListSetup = async () => {
         const message = `${filename} set as frame image`;
         sendBusEvent("image-set", message, "is-success");
       }
+      return;
     }
 
     const deleteButton = event.target.closest(".delete-image-button");
@@ -95,6 +144,7 @@ export const imageListSetup = async () => {
 
       const modalContent = createDeleteConfirmation({ id, filename });
       sendBusEvent("image-delete", null, null, modalContent);
+      return;
     }
 
     const imageButton = event.target.closest(".thumb-container");
@@ -127,15 +177,24 @@ export const imageListSetup = async () => {
       } else {
         removeImageFromList(imageDetailsRow?.dataset?.id);
       }
+      return;
+    }
+
+    const pagination = event.target.closest(".pagination");
+
+    if (pagination) {
+      const pageToGoTo = Number.parseInt(event.target?.dataset?.page);
+      if (!Number.isNaN(pageToGoTo)) {
+        console.log(searchInput.value, pageToGoTo, pageSize);
+        await runImageSearch(false, pageToGoTo);
+      }
     }
   });
 
-  searchButton.addEventListener("click", () => {
-    const searchValue = searchInput.value;
+  if (search) searchInput.value = search;
 
-    if (searchValue) {
-      runImageSearch(searchValue);
-    }
+  searchButton.addEventListener("click", () => {
+    runImageSearch(false, 1);
   });
 
   searchInput.addEventListener("input", (event) => {
@@ -143,7 +202,7 @@ export const imageListSetup = async () => {
     if (value?.length > 2) {
       searchButton.disabled = false;
     } else if (value?.length == 0) {
-      runImageSearch(null, true);
+      runImageSearch(true, 1);
     } else {
       searchButton.disabled = true;
     }
@@ -151,13 +210,13 @@ export const imageListSetup = async () => {
 
   searchInput.addEventListener("keyup", (event) => {
     if (event.key === "Enter") {
-      if (searchButton.disabled === false) runImageSearch();
+      if (searchButton.disabled === false) runImageSearch(false);
     }
   });
 
   refreshButton.addEventListener("click", async () => {
     refreshButton.classList.toggle("is-loading");
-    await runImageSearch();
+    await runImageSearch(false);
     refreshButton.classList.toggle("is-loading");
   });
 

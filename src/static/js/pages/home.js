@@ -78,7 +78,6 @@ const toggleUploadImageView = (showView) => {
 document.addEventListener("DOMContentLoaded", async () => {
   attachModelCloseEvents();
   await imageListSetup();
-  // await runImageSearch();
 
   uploadButton = document.getElementById("upload-button");
   clearUploadSelectionButton = document.getElementById(
@@ -98,19 +97,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       fileNamesListContainer.innerHTML = "";
       toggleUploadImageView(false);
-      const listContainerElement = document.createElement("div");
-      listContainerElement.classList.add("mb-4");
+      const imageUploadSelectionContainer = document.createElement("div");
+      imageUploadSelectionContainer.classList.add("mb-4");
       const paragraphElement = document.createElement("p");
+      paragraphElement.classList.add("cell", "title", "is-5");
       paragraphElement.textContent = "Images selected";
-      paragraphElement.classList.add("subtitle");
-      listContainerElement.appendChild(paragraphElement);
+      const listContainerElement = document.createElement("div");
+      listContainerElement.classList.add("mb-4", "grid");
+
       for (const file of fileArray) {
         const listItemElement = document.createElement("p");
         listItemElement.textContent = file.name;
         listItemElement.classList.add("subtitle", "is-size-6");
         listContainerElement.appendChild(listItemElement);
-        fileNamesListContainer.appendChild(listContainerElement);
       }
+      imageUploadSelectionContainer.appendChild(paragraphElement);
+      imageUploadSelectionContainer.appendChild(listContainerElement);
+      fileNamesListContainer.appendChild(imageUploadSelectionContainer);
 
       uploadButton.disabled = false;
       clearUploadSelectionButton.disabled = false;

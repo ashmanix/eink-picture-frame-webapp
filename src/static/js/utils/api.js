@@ -1,10 +1,16 @@
 import { TOKEN_KEY } from "../constants.js";
 
-export const updateList = async (search = null) => {
-  const url = new URL(globalThis.location.href + `image_list/partial`);
-  if (search) {
-    url.searchParams.set("search", search);
-  }
+export const updateList = async (
+  search = null,
+  pageNo = null,
+  pageSize = null
+) => {
+  const url = new URL("image_list/partial", globalThis.location.origin);
+  if (search) url.searchParams.set("search", search);
+  if (pageNo) url.searchParams.set("pageNo", pageNo);
+  if (pageSize) url.searchParams.set("pageSize", pageSize);
+
+  console.log("URL", url);
 
   const response = await callAPI(url, {}, "getting image list partial", "html");
   if (response?.error) {
@@ -18,7 +24,7 @@ export const updateList = async (search = null) => {
 };
 
 export const updateStorageDetails = async () => {
-  const url = new URL(globalThis.location.href + `storage/partial`);
+  const url = new URL("storage/partial", globalThis.location.origin);
   const response = await callAPI(url, {}, "getting storage partial", "html");
 
   if (response?.error) {

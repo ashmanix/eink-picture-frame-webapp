@@ -19,7 +19,7 @@
                     <span class="icon is-large">
                         <i class="fas fa-2x fa-upload"></i>
                     </span>
-                    <p class="title is-size-4 is-hidden-mobile">Drag and Drop to Upload File</p>
+                    <p class="title is-size-4 is-hidden-mobile">Drag and Drop to Upload Files</p>
                     <p class="title is-size-4 is-hidden-mobile">OR</p>
                 </div>
                 <div class="is-hidden" id="selected-images-container">
@@ -36,14 +36,14 @@
             </div>
         </div>
         <div class="buttons mt-4 is-justify-content-flex-end">
-            <button class="button is-responsive" disabled id="clear-image-selection-button"
+            <button class="button is-responsives" disabled id="clear-image-selection-button"
                 title="Clear image selection">
                 <span class="icon is-small">
                     <i class="fas fa-eraser"></i>
                 </span>
                 <span>Clear Selection</span>
             </button>
-            <button class="button is-link is-responsive" disabled id="upload-button" title="Upload image">
+            <button class="button is-link is-responsives" disabled id="upload-button" title="Upload image">
                 <span class="icon is-small">
                     <i class="fas fa-upload"></i>
                 </span>
@@ -55,22 +55,23 @@
             {% include "partial/storage_space.html" %}
         </div>
 
+        <div class="field has-addons">
+            <p class="control is-expanded">
+                <input id="search-input" class="input" type="text" placeholder="Search images" />
+            </p>
+            <p class="control">
+                <button class="button" id="search-button" title="Search images">
+                    <span class="icon is-small">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </span>
+                </button>
+            </p>
+        </div>
+
         <div class="level">
             <div class="level-left">
                 <div class="level-item">
-                    <div class="field has-addons is-expanded">
-                        <p class="control is-expanded">
-                            <input id="search-input" class="input is-responsive" type="text"
-                                placeholder="Search images" />
-                        </p>
-                        <p class="control">
-                            <button class="button" id="search-button" title="Search images">
-                                <span class="icon is-small">
-                                    <i class="fas fa-magnifying-glass"></i>
-                                </span>
-                            </button>
-                        </p>
-                    </div>
+
                 </div>
             </div>
             <div class="level-right">
