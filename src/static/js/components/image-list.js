@@ -160,6 +160,7 @@ export const imageListSetup = async () => {
         );
       } else {
         removeImageFromList(imageDetailsRow?.dataset?.id);
+        selectAllToggleButton.classList.remove("is-active");
       }
       return;
     }
@@ -225,11 +226,13 @@ export const imageListSetup = async () => {
       for (const row of allRows) {
         row.classList.add("is-selected");
         addImageToList(row.dataset.id, row.dataset.filename);
+        selectAllToggleButton.classList.add("is-active");
       }
     } else {
       for (const row of selectedRows) {
         row.classList.remove("is-selected");
         removeImageFromList(row.dataset.id);
+        selectAllToggleButton.classList.remove("is-active");
       }
     }
 
