@@ -31,7 +31,13 @@ from web.utils import (
     format_datetime,
     get_remaining_storage_space,
 )
-from web.constants import IMAGE_FOLDER_LOCATION, ALLOWED_EXTENSIONS, TOKEN_TTL_SECS
+from web.constants import (
+    IMAGE_FOLDER_LOCATION,
+    ALLOWED_EXTENSIONS,
+    TOKEN_TTL_SECS,
+    DEFAULT_PAGE_NO,
+    DEFAULT_PAGE_SIZE,
+)
 from web.auth import validate_token, check_credentials, issue_token, revoke_token
 
 from .logger import logger
@@ -101,8 +107,8 @@ async def root(
     request: Request,
     session: SessionDep,
     search: str | None = None,
-    page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
-    page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
+    page_no: Annotated[int | None, Query(alias="pageNo")] = DEFAULT_PAGE_NO,
+    page_size: Annotated[int | None, Query(alias="pageSize")] = DEFAULT_PAGE_SIZE,
 ):
     result: ImageQueryResult = get_image_list(session, search, page_no, page_size)
     storage = get_remaining_storage_space()
@@ -138,8 +144,8 @@ async def get_list_partial(
     request: Request,
     session: SessionDep,
     search: str | None = None,
-    page_no: Annotated[int | None, Query(alias="pageNo")] = 1,
-    page_size: Annotated[int | None, Query(alias="pageSize")] = 25,
+    page_no: Annotated[int | None, Query(alias="pageNo")] = DEFAULT_PAGE_NO,
+    page_size: Annotated[int | None, Query(alias="pageSize")] = DEFAULT_PAGE_SIZE,
 ):
     try:
         result: ImageQueryResult = get_image_list(session, search, page_no, page_size)
@@ -169,9 +175,13 @@ async def get_storage_space():
 
 
 @app.get("/image_list", description="Get list of images stored on device")
-async def get_list_of_images(session: SessionDep):
+async def get_list_of_images(
+    session: SessionDep,
+    page_no: Annotated[int | None, Query(alias="pageNo")] = DEFAULT_PAGE_NO,
+    page_size: Annotated[int | None, Query(alias="pageSize")] = DEFAULT_PAGE_SIZE,
+):
     try:
-        results = get_all(session)
+        results = get_all(session, page_no, page_size)
         return {"image_list": results}
 
     except Exception as err:
@@ -249,7 +259,9 @@ async def upload_image(session: SessionDep, file: UploadFile = File(...)):
         filename = file.filename
         file = file.file
         if not check_is_valid_image_type(filename):
-            raise TypeError(f"{filename} is not a valid image file type!")
+            raise TypeError(
+                f"{filename} is not a valid image file type. Accepted files types are: {ALLOWED_EXTENSIONS}"
+            )
         if check_if_file_exists(filename):
             raise RuntimeError(f"{filename} is already on device!")
         save_image(filename, file, session)

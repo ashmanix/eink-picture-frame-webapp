@@ -11,39 +11,12 @@
             Images saved on device
         </h2>
     </div>
-
-    <div class="notifications">
-        <div class="upload-image-container">
-            <div class="is-flex-direction-column">
-                <div id="upload-images-main-text" class="is-hidden-mobile mb-4">
-                    <span class="icon is-large">
-                        <i class="fas fa-2x fa-upload"></i>
-                    </span>
-                    <p class="title is-size-4 is-hidden-mobile">Drag and Drop to Upload Files</p>
-                    <p class="title is-size-4 is-hidden-mobile">OR</p>
-                </div>
-                <div class="is-hidden" id="selected-images-container">
-                </div>
-                <div id="upload-image-input" class="file is-centered is-link">
-                    <label class="file-label">
-                        <input class="file-input" type="file" name="image file upload" accept="{{ allowedExtensions }}"
-                            multiple />
-                        <span class="file-cta">
-                            <span class="file-label"> Browse Files To Upload </span>
-                        </span>
-                    </label>
-                </div>
-            </div>
+    <div class="columns">
+        <div id="storage-details-container" class="mb-4d column is-align-content-center">
+            {% include "partial/storage_space.html" %}
         </div>
-        <div class="buttons mt-4 is-justify-content-flex-end">
-            <button class="button is-responsives" disabled id="clear-image-selection-button"
-                title="Clear image selection">
-                <span class="icon is-small">
-                    <i class="fas fa-eraser"></i>
-                </span>
-                <span>Clear Selection</span>
-            </button>
-            <button class="button is-link is-responsives" disabled id="upload-button" title="Upload image">
+        <div class="column is-narrow-tablet flex-shrink has-text-centered">
+            <button class="button is-primary" id="open-upload-modal-button" title="Open upload image modal">
                 <span class="icon is-small">
                     <i class="fas fa-upload"></i>
                 </span>
@@ -51,69 +24,106 @@
             </button>
         </div>
 
-        <div id="storage-details-container" class="mb-4">
-            {% include "partial/storage_space.html" %}
-        </div>
+    </div>
 
-        <div class="field has-addons">
-            <p class="control is-expanded">
-                <input id="search-input" class="input" type="text" placeholder="Search images" />
-            </p>
-            <p class="control">
-                <button class="button" id="search-button" title="Search images">
-                    <span class="icon is-small">
-                        <i class="fas fa-magnifying-glass"></i>
-                    </span>
-                </button>
-            </p>
-        </div>
-
-        <div class="level">
-            <div class="level-left">
-                <div class="level-item">
-
-                </div>
-            </div>
-            <div class="level-right">
-                <div class="field has-addons level-item">
-                    <p class="control">
-                        <button class="button delete-image-button" id="delete-all-button"
-                            title="Delete all selected images" disabled>
-                            <span class="icon is-small">
-                                <i class="fas fa-trash"></i>
-                            </span>
-                        </button>
-                    </p>
-                    <p class="control">
-                        <button class="button" id="select-all-toggle-button" title="Toggle selecting all images">
-                            <span class="icon is-small">
-                                <i class="fas fa-check-double"></i>
-                            </span>
-                        </button>
-                    </p>
-                    <p class="control">
-                        <button class="button" id="refresh-list-button" title="Refresh list">
-                            <span class="icon is-small">
-                                <i class="fas fa-rotate-right"></i>
-                            </span>
-                        </button>
-                    </p>
-                </div>
+    <div class="columns">
+        <div class="column">
+            <div class="field has-addons">
+                <p class="control is-expanded">
+                    <input id="search-input" class="input" type="text" placeholder="Search images" />
+                </p>
+                <p class="control">
+                    <button class="button" id="search-button" title="Search images">
+                        <span class="icon is-small">
+                            <i class="fas fa-magnifying-glass"></i>
+                        </span>
+                    </button>
+                </p>
             </div>
         </div>
-
-        <section id="list-of-cards">
-            <div id="image-list-container">
-                {% include "partial/image_list.html" %}
+        <div class="column is-narrow-tablet">
+            <div class="field has-addons is-justify-content-flex-end">
+                <p class="control">
+                    <button class="button delete-image-button" id="delete-all-button" title="Delete all selected images"
+                        disabled>
+                        <span class="icon is-small">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                    </button>
+                </p>
+                <p class="control">
+                    <button class="button" id="select-all-toggle-button" title="Toggle selecting all images">
+                        <span class="icon is-small">
+                            <i class="fas fa-check-double"></i>
+                        </span>
+                    </button>
+                </p>
+                <p class="control">
+                    <button class="button" id="refresh-list-button" title="Refresh list">
+                        <span class="icon is-small">
+                            <i class="fas fa-rotate-right"></i>
+                        </span>
+                    </button>
+                </p>
             </div>
-        </section>
-        <div id="app-modal" class="modal">
-            <div class="modal-background"></div>
-            <div class="modal-content">
-            </div>
-            <button id="image-model-close-button" class="modal-close is-large" aria-label="close"></button>
         </div>
     </div>
+
+    <section id="list-of-cards">
+        <div id="image-list-container">
+            {% include "partial/image_list.html" %}
+        </div>
+    </section>
+    <div id="app-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+        </div>
+        <button id="image-model-close-button" class="modal-close is-large" aria-label="close"></button>
+    </div>
+    <div class="notifications">
+    </div>
+
+    <template id="upload-form-template">
+        <div class="notification notification-container">
+            <div class="upload-image-container">
+                <div class="is-flex-direction-column">
+                    <div id="upload-images-main-text" class="is-hidden-mobile mb-4">
+                        <span class="icon is-large">
+                            <i class="fas fa-2x fa-upload"></i>
+                        </span>
+                        <p class="title is-size-4 is-hidden-mobile">Drag and Drop to Upload Files</p>
+                        <p class="title is-size-4 is-hidden-mobile">OR</p>
+                    </div>
+                    <div class="is-hidden" id="selected-images-container">
+                    </div>
+                    <div id="upload-image-input" class="file is-centered is-link">
+                        <label class="file-label">
+                            <input class="file-input" type="file" name="image file upload"
+                                accept="{{ allowedExtensions }}" multiple />
+                            <span class="file-cta">
+                                <span class="file-label"> Browse Files To Upload </span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons mt-4 is-justify-content-flex-end">
+                <button class="button is-responsives" disabled id="clear-image-selection-button"
+                    title="Clear image selection">
+                    <span class="icon is-small">
+                        <i class="fas fa-eraser"></i>
+                    </span>
+                    <span>Clear Selection</span>
+                </button>
+                <button class="button is-link is-responsives" disabled id="upload-button" title="Upload image">
+                    <span class="icon is-small">
+                        <i class="fas fa-upload"></i>
+                    </span>
+                    <span>Upload</span>
+                </button>
+            </div>
+        </div>
+    </template>
 
     {% endblock %}
     {% block scripts %}

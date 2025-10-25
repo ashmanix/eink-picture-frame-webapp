@@ -10,8 +10,6 @@ export const updateList = async (
   if (pageNo) url.searchParams.set("pageNo", pageNo);
   if (pageSize) url.searchParams.set("pageSize", pageSize);
 
-  console.log("URL", url);
-
   const response = await callAPI(url, {}, "getting image list partial", "html");
   if (response?.error) {
     return response;
@@ -109,11 +107,8 @@ export const login = async (username, password) => {
   };
   const result = await callAPI(url, options);
 
-  // console.log("RRESULT: ", result);
-
   if (result?.error) return result;
 
-  // sessionStorage.setItem(TOKEN_KEY, result.token);
   globalThis.location.replace("/");
 };
 

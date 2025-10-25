@@ -9,6 +9,7 @@
         <div class="table-container">
             <table class="table is-bordered is-fullwidth is-outlined is-hoverable">
                 <thead>
+                    <th class="is-hidden-mobile">ID</th>
                     <th>
                         <div class="tooltip">
                             Prev
@@ -16,7 +17,6 @@
                         </div>
                     </th>
                     <th>Filename</th>
-                    <th class="is-hidden-mobile">ID</th>
                     <th class="is-hidden-mobile">Created</th>
                     <th>Options</th>
                 </thead>
@@ -25,6 +25,9 @@
                     {% for image in imageList %}
                     <tr data-id="{{ image.id }}" class="image-details-row" data-id="{{ image.id }}"
                         data-filename="{{ image.filename }}">
+                        <td class="is-hidden-mobile">
+                            {{ image.id }}
+                        </td>
                         <td>
                             <figure>
                                 <p class="image thumb-container is-64x64 is-hidden-mobile"
@@ -45,11 +48,6 @@
                                 {{ image.filename | truncate(20) }}
                                 <span class="tooltiptext">{{ image.filename }}</span>
                             </div>
-                            <progress class="progress is-small is-primary mt-5 is-hidden" data-id="{{ image.id }}"
-                                value="0" max="100"></progress>
-                        </td>
-                        <td class="is-hidden-mobile">
-                            {{ image.id }}
                         </td>
                         <td class="is-hidden-mobile">
                             {{ image.created_at }}

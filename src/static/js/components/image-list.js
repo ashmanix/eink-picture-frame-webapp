@@ -35,12 +35,10 @@ export const runImageSearch = async (clearList = false, pNo = pageNo) => {
       url.searchParams.set("pageSize", pageSize);
       history.replaceState(null, "", url);
 
-      console.log(`Here, page no: ${pNo}, search value: ${searchValue}`);
-
       const result = await updateList(null, pNo, pageSize);
 
       if (result?.error) {
-        const message = createErrorMessage("Error loading image list", result);
+        const message = createErrorMessage("Loading image list", result);
         sendBusEvent("image-search", message, "is-danger");
       }
     } else {
@@ -51,10 +49,7 @@ export const runImageSearch = async (clearList = false, pNo = pageNo) => {
 
       const result = await updateList(searchValue, pNo, pageSize);
       if (result?.error) {
-        const message = createErrorMessage(
-          "Error searching image list",
-          result
-        );
+        const message = createErrorMessage("Searching image list", result);
         sendBusEvent("image-search", message, "is-danger");
       }
     }
@@ -115,7 +110,7 @@ export const imageListSetup = async () => {
       toggleEnableImageButtons(id, true);
       if (result?.error) {
         const message = createErrorMessage(
-          `Error attempting to set ${filename} as frame image`,
+          `Attempting to set ${filename} as frame image`,
           result
         );
         sendBusEvent("image-set", message, "is-danger");
@@ -280,7 +275,7 @@ const createDeleteConfirmation = (imageToDelete) => {
     const result = await deleteImage(imageToDelete?.id);
     if (result?.error) {
       const message = createErrorMessage(
-        `Error attempting to delete image ${imageToDelete?.filename}`,
+        `Attemoting to delete image ${imageToDelete?.filename}`,
         result
       );
       toggleEnableImageButtons(imageToDelete?.id, true);
@@ -346,7 +341,7 @@ const createMultipleDeleteConfirmation = (imagesToDelete) => {
         toggleEnableImageButtons(image?.id, true);
       }
       const message = createErrorMessage(
-        `Error deleting multiple messages`,
+        `Attempting to delete multiple images`,
         result
       );
       sendBusEvent("image-deleted", message, "is-danger");

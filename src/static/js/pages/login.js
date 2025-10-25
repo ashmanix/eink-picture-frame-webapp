@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
           formInput?.input.classList.add("is-danger");
         }
         setNotification(
-          createErrorMessage("Error attempting to login", result),
+          createErrorMessage("Attempting to login", result),
           "is-danger"
         );
       }
