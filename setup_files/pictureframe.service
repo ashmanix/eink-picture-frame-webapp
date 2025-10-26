@@ -1,0 +1,26 @@
+[Unit]
+Description=Ashmanix E-Ink PictureFrame App
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/eink-picture-frame-webapp
+
+# Make sure uv is on PATH; adjust if your uv lives elsewhere
+Environment="PATH=/home/pi/.local/bin:usr/local/bin:/usr/bin"
+
+# If you keep secrets/env in a file, uncomment:
+EnvironmentFile=/home/pi/eink-picture-frame-webapp/.env
+
+# Use your locked deps; remove --frozen if you want uv to resolve on boot
+ExecStart=/usr/bin/env uv run --frozen uvicorn web.main:app --host 0.0.0.0 --port 8000
+
+Restart=on-failure
+RestartSec=2
+
+ReadWritePaths=/home/pi/eink-picture-frame-webapp/src/db /home/pi/eink-picture-frame-webapp/src/static/images
+
+[Install]
+WantedBy=multi-user.target

@@ -5,7 +5,7 @@ from web.models import PictureFrameImage, ImageQueryResult
 
 
 sqlite_file_name = "image_database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+sqlite_url = f"sqlite:///src/db/{sqlite_file_name}"
 
 connect_args = {"check_same_thread": False}
 engine = create_engine(sqlite_url, connect_args=connect_args)
